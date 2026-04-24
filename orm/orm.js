@@ -1,12 +1,37 @@
 const DbHandler = require("./shandler");
 const path = require("path");
-const db = new DbHandler(path.join(__dirname, "../db/dawe_ub2_db.db"));
+const db = new DbHandler(path.join(__dirname, "../db/dawe_db.db"));
 
 class Model{
     constructor(db){
         this.db = db;
     }
+
+    //returns model object
+    readOne(id){
+        return this.db.readOne(this.constructor.name, id);
+    }
+
+    //returns model object
+    search(search, order){
+        return this.db.search(this.constructor.name, search, order);
+    }
+
+    updateOne(record){
+        if(this.validateForUpdate(record)){
+            this.db.updateOne(this.constructor.name, record);
+        }else{
+            throw new Error("there is a problem with validation of this record");
+        }
+    }
+
+    deleteOne(id){
+        this.db.deleteOne(this.constructor.name, id);
+    }
 }
+
+
+//CITY
 
 class City extends Model{
     
@@ -55,6 +80,34 @@ class City extends Model{
         }
     }
 
+
+    validateForUpdate(record){
+        
+        if(!record.id){
+            throw new Error("id is required for update")
+        }
+        
+        const existingCity = this.db.readOne("City", record.id);
+        
+        if (!existingCity) {
+            throw new Error("city does not exist");
+        }
+
+        if (record.population!== undefined) {
+            if(record.population < 0 || record.population > Number.MAX_SAFE_INTEGER){
+                throw new Error("invalid population");
+            }
+        }
+        
+        if (record.country_id !== undefined) {
+            const country = this.db.readOne("Country", record.country_id);
+            if (!country) {
+                throw new Error("country not found");
+            }
+        }
+        return true;
+    }
+
     //relationship located on
 
     placeCityOnRiver(idCity, idRiver){
@@ -74,39 +127,10 @@ class City extends Model{
             river_id: river.id
         });
     }
-
-    //returns model object
-    readOne(id){
-        return this.db.readOne("City", id);
-    }
-
-    //returns model object
-    search(search, order){
-        return this.db.search("City", search, order);
-    }
-
-    updateOne(record){
-        this.db.updateOne("City", record);
-    }
-
-    deleteOne(id){
-        this.db.deleteOne("City", id);
-    }
 }
 
-/*
-const city = new City(db);
 
-//city.createOne(name= "Bingen", coordinates = "0.0.0.0", population= 30000, country_name= "Germany");
-const bingen = city.search({
-                            name:"Bingen"
-                        }, {
-                            by: "name",
-                            type: "desc"
-                        });
-
-console.log(bingen);
-*/
+//COUNTRY
 
 class Country extends Model {
     createOne(name, is_democratic, population){
@@ -142,23 +166,32 @@ class Country extends Model {
             }
         }
     }
+    
 
-    //returns model object
-    readOne(id){
-        return this.db.readOne("Country", id);
-    }
+    validateForUpdate(record){
+        
+        if(!record.id){
+            throw new Error("id is required for update")
+        }
+        
+        const existingCountry = this.db.readOne("Country", record.id);
+        
+        if (!existingCountry) {
+            throw new Error("city does not exist");
+        }
 
-    //returns model object
-    search(search, order){
-        return this.db.search("Country", search, order);
-    }
-
-    updateOne(record){
-        this.db.updateOne("Country", record);
-    }
-
-    deleteOne(id){
-        this.db.deleteOne("Country", id);
+        if (record.population!== undefined) {
+            if(record.population < 0 || record.population > Number.MAX_SAFE_INTEGER){
+                throw new Error("invalid population");
+            }
+        }
+        
+        if (record.is_democratic !== undefined) {
+            if (typeof record.is_democratic !== Boolean) {
+                throw new Error("type exception: is_democratic must be boolean");
+            }
+        }
+        return true;
     }
 
     //Relationship HAS_RIVER
@@ -199,10 +232,32 @@ class Country extends Model {
         });
     }
 
+    updateCapital(idCity, idCountry){
+        const country = this.db.search("Country", {id: idCountry}, {by: "name", type: "desc"});
+        const city = this.db.search("City", {id:idCity}, {by: "name", type: "desc"});
 
-    //TODO: update capital of country
+        if (!country){
+            throw new Error("there is no such country")
+        }
+
+        if(!city){
+            throw new Error("there is no such city")
+        }
+
+        const capital_id = this.db.search("Capital", {country_id: idCountry}, {by: "country_id", type: "desc"}).id;
+
+        const record = {
+            id: capital_id,
+            country_id: idCountry,
+            capital_city_id: idCity
+        };
+
+        const placed = this.db.updateOne("CAPITAL", record);
+    }
+
 }
 
+//RIVER
 
 class River extends Model {
     createOne(name, length){
@@ -239,148 +294,41 @@ class River extends Model {
         }
     }
 
-    //returns model object
-    readOne(id){
-        return this.db.readOne("River", id);
-    }
+    validateForUpdate(record){
+        
+        if(!record.id){
+            throw new Error("id is required for update")
+        }
+        
+        const existingRiver = this.db.readOne("River", record.id);
+        
+        if (!existingCity) {
+            throw new Error("river does not exist");
+        }
 
-    //returns model object
-    search(search, order){
-        return this.db.search("River", search, order);
-    }
-
-    updateOne(record){
-        this.db.updateOne("River", record);
-    }
-
-    deleteOne(id){
-        this.db.deleteOne("River", id);
+        if (record.length== undefined|| record.length < 0 || record.length > Number.MAX_SAFE_INTEGER) {
+            throw new Error("invalid length");
+        }
+        return true;
     }
 }
 
-
+const country = new Country(db);
+const germany = country.search({name: "Germany"},
+    {
+        by: "name",
+        type: "desc"
+    }
+);
 /*
-Vorteile:
-Isolierung der logischen Ebenen:
+const bonn = city.createOne("Bonn", "123123", 340226, "Germany");
 
-+ ist sehr hilfreich für die zukündftige Erweiterungen 
-(mann kann separat die obere orm Ebene erweitern für die spezifische Anfragen, z.B get City population)
-
-+ einfaches debug
-
-+ einfacher Umzug auf eine andere db (nur die Logik im DB-Handler muss geändert werden)
-
-Nachteile:
-- größere Menge an Code
-- Programmieraufwand
-- durch der Nutzung der mehreren Ebenen ist weniger effizient
+const city = new City(db);
+const bonn_id = city.search({name:"Bonn"},
+    {
+        by: "name",
+        type: "desc"
+    }
+).id;
+country.updateCapital(bonn_id, germany.id);
 */
-
-module.exports = {
-    Model,
-    City,
-    Country,
-    River
-};
-
-function printSection(title){
-    console.log(`\n=== ${title} ===`);
-}
-
-function runDemoTests(){
-    const city = new City(db);
-    const country = new Country(db);
-    const river = new River(db);
-
-    printSection("READ existing country");
-    console.log(country.readOne(1));
-
-    printSection("SEARCH existing country by name");
-    console.log(country.search(
-        { name: "Germany" },
-        { by: "name", type: "desc" }
-    ));
-
-    printSection("CREATE river");
-    river.createOne("TestRiver", 111);
-    console.log(river.search(
-        { name: "TestRiver" },
-        { by: "name", type: "desc" }
-    ));
-
-    printSection("CREATE city");
-    city.createOne("TestCity", "10.10,20.20", 12345, "Germany");
-    console.log(city.search(
-        { name: "TestCity" },
-        { by: "name", type: "desc" }
-    ));
-
-    const testCity = city.search(
-        { name: "TestCity" },
-        { by: "name", type: "desc" }
-    );
-
-    const testRiver = river.search(
-        { name: "TestRiver" },
-        { by: "name", type: "desc" }
-    );
-
-    printSection("UPDATE city");
-    if (testCity) {
-        city.updateOne({
-            id: testCity.id,
-            name: "TestCityUpdated",
-            coordinates: testCity.coordinates,
-            population: 54321,
-            country_id: testCity.country_id
-        });
-        console.log(city.readOne(testCity.id));
-    } else {
-        console.log("TestCity was not created, update skipped");
-    }
-
-    printSection("CREATE relations");
-    if (testCity && testRiver) {
-        city.placeCityOnRiver(testCity.id, testRiver.id);
-        country.addRiverToCountry(1, testRiver.id);
-        console.log("Relations created");
-    } else {
-        console.log("Relation creation skipped because city or river is missing");
-    }
-
-    printSection("DELETE demo records");
-    const updatedCity = city.search(
-        { name: "TestCityUpdated" },
-        { by: "name", type: "desc" }
-    );
-
-    if (updatedCity) {
-        city.deleteOne(updatedCity.id);
-    }
-
-    const createdRiver = river.search(
-        { name: "TestRiver" },
-        { by: "name", type: "desc" }
-    );
-
-    if (createdRiver) {
-        river.deleteOne(createdRiver.id);
-    }
-
-    console.log("Remaining city:", city.search(
-        { name: "TestCityUpdated" },
-        { by: "name", type: "desc" }
-    ));
-    console.log("Remaining river:", river.search(
-        { name: "TestRiver" },
-        { by: "name", type: "desc" }
-    ));
-}
-
-if (require.main === module) {
-    try {
-        runDemoTests();
-    } catch (err) {
-        console.log("Demo test failed:", err.message);
-    }
-}
