@@ -1,0 +1,69 @@
+BEGIN;
+
+CREATE TABLE COUNTRY
+(
+  id INTEGER NOT NULL,
+  name VARCHAR NOT NULL,
+  is_democratic BOOLEAN NOT NULL,
+  population INTEGER NOT NULL,
+  PRIMARY KEY (id),
+  CHECK (population > 0)
+);
+
+CREATE TABLE CITY
+(
+  id INTEGER NOT NULL,
+  name VARCHAR NOT NULL,
+  coordinates VARCHAR NOT NULL,
+  population INTEGER NOT NULL,
+  country_id INTEGER NOT NULL,
+  PRIMARY KEY (id),
+  FOREIGN KEY (country_id) REFERENCES COUNTRY(id) ON DELETE CASCADE,
+  CHECK (population > 0)
+);
+
+CREATE TABLE RIVER
+(
+  id INTEGER NOT NULL,
+  name VARCHAR NOT NULL,
+  length INTEGER NOT NULL,
+  PRIMARY KEY (id),
+  CHECK (length > 0)
+);
+
+CREATE TABLE LOCATED_ON
+(
+  city_id INTEGER NOT NULL,
+  river_id INTEGER NOT NULL,
+  PRIMARY KEY (city_id, river_id),
+  FOREIGN KEY (city_id) REFERENCES CITY(id) ON DELETE CASCADE,
+  FOREIGN KEY (river_id) REFERENCES RIVER(id) ON DELETE CASCADE
+);
+
+CREATE TABLE HAS_RIVER
+(
+  country_id INTEGER NOT NULL,
+  river_id INTEGER NOT NULL,
+  PRIMARY KEY (country_id, river_id),
+  FOREIGN KEY (river_id) REFERENCES RIVER(id) ON DELETE CASCADE,
+  FOREIGN KEY (country_id) REFERENCES COUNTRY(id) ON DELETE CASCADE
+);
+
+CREATE TABLE CAPITAL
+(
+    country_id INTEGER NOT NULL PRIMARY KEY,
+    capital_city_id INTEGER NOT NULL UNIQUE,
+    FOREIGN KEY (country_id) REFERENCES COUNTRY(id) ON DELETE CASCADE,
+    FOREIGN KEY (capital_city_id) REFERENCES CITY(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_city_country
+ON CITY(country_id);
+
+CREATE INDEX idx_located_on_city
+ON LOCATED_ON(city_id);
+
+CREATE INDEX idx_located_on_river
+ON LOCATED_ON(river_id);
+
+COMMIT;
