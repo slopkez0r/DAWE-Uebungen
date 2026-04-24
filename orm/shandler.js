@@ -30,9 +30,9 @@ class DbHandler{
 
     updateOne(model_name, record){
 
-        //TODO: validierung
-        
-        if(this.search(model_name, {id: record.id}, {by:"name", type:"desc"})){
+        if (!record.id){throw new Error("id is required");}
+
+        if(this.readOne(model_name, record.id)){
             const columns = Object.keys(record);
             const index_id = columns.indexOf("id");
             const values = Object.values(record);
