@@ -121,6 +121,23 @@ app.post('/update/:modelname', async(req, res) => {
 });
 
 
+//DELETE
+
+app.delete('/delete/:modelname/:id', async(req, res) => {
+    const modelName = normalize(req.params.modelname);
+    const id = Number.parseInt(req.params.id);
+
+    try{
+        const modelObj = getCorrectModelObject(models, modelName);
+        const deletedRecord = modelObj.readOne(id);
+        modelObj.deleteOne(id);
+        res.status(200).json(deletedRecord);
+    }catch(error){
+        console.error(error);
+        req.status(500).json({error: `There was a problem by deleting ${modelName}`});
+    }
+});
+
 app.listen(3000, () => {
     console.log("Server is listening on localhost");
 });
