@@ -66,7 +66,7 @@ class DbHandler{
             if(i>0){
                 filterStatement += " AND ";
             }
-            filterStatement += (fields[i] + " = " + values[i]);
+            filterStatement += (fields[i] + order.operator + values[i]);
         }
 
         var sql = `SELECT * FROM ${model.toUpperCase()} ${filterStatement} ORDER BY ${order.by.toLowerCase()} ${order.type.toUpperCase()};`
