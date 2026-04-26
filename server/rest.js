@@ -2,7 +2,6 @@ const [Model, City, Country, River] = require("../orm/orm");
 const DbHandler = require("../orm/shandler");
 const path = require("path");
 const express = require("express");
-const strict = require("assert/strict");
 var app = express();
 
 const db = new DbHandler(path.join(__dirname, "../db/dawe_db.db"));
