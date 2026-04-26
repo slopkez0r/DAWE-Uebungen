@@ -90,6 +90,21 @@ app.get('/search/uri/:modelname/where/:field/:operator/:searchValue/by/:orderBy/
 });
 
 
+//json body
+app.post('/search/jsonBody/:modelname', async(req, res) =>{
+    const modelName = normalize(req.params.modelname);
+    const body = req.body;
+    try {
+        const modelObj = getCorrectModelObject(models, modelName);
+        const result = modelObj.search(body);
+        res.status(200).json(result);
+    }catch(error){
+        console.error(error);
+        res.status(500).json({error: `An error occured while searching for the ${modelName}`});
+    }
+});
+
+
 app.listen(3000, () => {
     console.log("Server is listening on localhost");
 });
