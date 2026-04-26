@@ -55,7 +55,7 @@ app.get('/search/query/:modelname', async(req, res) => {
     
     try{
         const modelObj = getCorrectModelObject(models, modelName);
-        const result = modelObj.search(queryObj, {by: "name", type: "desc"});
+        const result = modelObj.search(queryObj);
         res.status(200).json(result);
     }catch(error){
         console.error(error);
@@ -63,19 +63,27 @@ app.get('/search/query/:modelname', async(req, res) => {
     }
 });
 
-//query parameters
-app.get('/search/uri/:modelname', async(req, res) => {
-    const modelName = normalize(req.params.modelname);
-    const queryObj = req.query;
+//uri parameters
 
-    const queryKeys = Object.keys(queryObj);
-    const queryValues = Object.values(queryObj);
+//TODO: logik für die suche nach mehreren Parameter hinzufügen
+
+app.get('/search/uri/:modelname/where/:field/:operator/:searchValue/by/:orderBy/type/:orderType', async(req, res) => {
+    const modelName = normalize(req.params.modelname);
+    const field = req.params.field;
+    const searchValue = req.params.searchValue;
+
+    const queryObj = { [field]: searchValue, //dynamischer name des feldes aus query
+                       operator: req.params.operator,
+                       by: req.params.orderBy,
+                       type: req.params.orderType
+    };
     
     try{
         const modelObj = getCorrectModelObject(models, modelName);
-        const result = modelObj.search(queryObj, {by: "name", type: "desc"});
+        const result = modelObj.search(queryObj);
         res.status(200).json(result);
     }catch(error){
+        console.log(queryObj);
         console.error(error);
         res.status(500).json({error: `An error occured while searching for the ${modelName}`});
     }
