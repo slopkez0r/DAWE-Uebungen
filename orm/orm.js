@@ -14,7 +14,7 @@ class Model{
 
     //returns model object
     search(search, order){
-        return this.db.search(this.constructor.name, search, order);
+        return this.db.search(this.constructor.name, search);
     }
 
     updateOne(record){
@@ -111,8 +111,8 @@ class City extends Model{
     //relationship located on
 
     placeCityOnRiver(idCity, idRiver){
-        const city = this.db.search("City", {id: idCity}, {by: "name", type: "desc"});
-        const river = this.db.search("River", {id: idRiver}, {by: "name", type: "desc"});
+        const city = this.db.search("City", {id: idCity, by: "name", type: "desc"});
+        const river = this.db.search("River", {id: idRiver, by: "name", type: "desc"});
 
         if (!city){
             throw new Error("there is no such city")
@@ -234,7 +234,7 @@ class Country extends Model {
 
     updateCapital(idCity, idCountry){
         const country = this.db.search("Country", {id: idCountry}, {by: "name", type: "desc"});
-        const city = this.db.search("City", {id:idCity}, {by: "name", type: "desc"});
+        const city = this.db.search("City", {id:idCity, by: "name", type: "desc"});
 
         if (!country){
             throw new Error("there is no such country")
@@ -244,7 +244,7 @@ class Country extends Model {
             throw new Error("there is no such city")
         }
 
-        const capital_id = this.db.search("Capital", {country_id: idCountry}, {by: "country_id", type: "desc"}).id;
+        const capital_id = this.db.search("Capital", {country_id: idCountry, by: "country_id", type: "desc"}).id;
 
         const record = {
             id: capital_id,

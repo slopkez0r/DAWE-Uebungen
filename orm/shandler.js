@@ -57,19 +57,21 @@ class DbHandler{
     }
 
     // suche nach nur einen Parameter
-    search(model, search, order){
+    search(model, search){
         const fields = Object.keys(search);
         const values = Object.values(search).map((x) => this.#checktype(x));
         var filterStatement = "WHERE ";
 
         for(var i = 0; i<fields.length; i++){
-            if(i>0){
+            if((fields[i] != "operator") && (fields[i]!="by") && (fields[i]!="type")){
+                if(i>0){
                 filterStatement += " AND ";
+                }
+                filterStatement += (fields[i] + search.operator + values[i]);
             }
-            filterStatement += (fields[i] + order.operator + values[i]);
         }
 
-        var sql = `SELECT * FROM ${model.toUpperCase()} ${filterStatement} ORDER BY ${order.by.toLowerCase()} ${order.type.toUpperCase()};`
+        var sql = `SELECT * FROM ${model.toUpperCase()} ${filterStatement} ORDER BY ${search.by.toLowerCase()} ${search.type.toUpperCase()};`
         return this.#loadDb(sql);
     }
 
