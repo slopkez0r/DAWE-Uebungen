@@ -105,6 +105,22 @@ app.post('/search/jsonBody/:modelname', async(req, res) =>{
 });
 
 
+//PUT
+app.post('/update/:modelname', async(req, res) => {
+    const modelName = normalize(req.params.modelname);
+    const body = req.body;
+    try{
+        const modelObj = getCorrectModelObject(models, modelName);
+        modelObj.updateOne(body);
+        const updated = modelObj.readOne(body.id);
+        res.status(200).json(updated);
+    }catch(error){
+        console.error(error);
+        req.status(500).json({error: `There was a problem by updating ${modelName}`});
+    }
+});
+
+
 app.listen(3000, () => {
     console.log("Server is listening on localhost");
 });
