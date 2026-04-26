@@ -313,6 +313,9 @@ class River extends Model {
     }
 }
 
+module.exports = [Model, City, Country, River];
+
+/*
 const country = new Country(db);
 const germany = country.search({name: "Germany"},
     {
@@ -320,7 +323,7 @@ const germany = country.search({name: "Germany"},
         type: "desc"
     }
 );
-/*
+
 const bonn = city.createOne("Bonn", "123123", 340226, "Germany");
 
 const city = new City(db);
