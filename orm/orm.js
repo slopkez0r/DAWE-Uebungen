@@ -35,12 +35,12 @@ class Model{
 
 class City extends Model{
     
-    createOne(name, coordinates, population, country_name){
+    createOne(body){
         const record = {
-            name: name,
-            coordinates: coordinates,
-            population: population,
-            country_name: country_name
+            name: body.name,
+            coordinates: body.coordinates,
+            population: body.population,
+            country_name: body.country_name
         }
 
         try {
@@ -133,11 +133,11 @@ class City extends Model{
 //COUNTRY
 
 class Country extends Model {
-    createOne(name, is_democratic, population){
+    createOne(body){
         const record = {
-            name: name,
-            is_democratic: is_democratic,
-            population: population
+            name: body.name,
+            is_democratic: body.is_democratic,
+            population: body.population
         }
 
         try {
@@ -260,10 +260,10 @@ class Country extends Model {
 //RIVER
 
 class River extends Model {
-    createOne(name, length){
+    createOne(body){
         const record = {
-            name: name,
-            length: length
+            name: body.name,
+            length: body.length
         }
 
         try {
