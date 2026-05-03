@@ -197,18 +197,42 @@ var schema = buildSchema(`
         countries: [Country]
         cities: [City]
     }
+
+    input Search {
+        field: String
+        value: String
+        operator: String
+        by: String
+        type: String
+    }
     
     type Query{
+
         readOneCity(id: ID!) : City!
+        searchCity(search: Search): [City]
+        
         readOneRiver(id: ID!) : River!
+        searchRiver(search: Search): [River]
+
+
         readOneCountry(id: ID) : Country!
+        searchCountry(search: Search): [Country]
     }
 
     type Mutation{
-        addCity(id: ID!, name: String!, population: Int!, coordinates: String!, addCountry: ID, isCapital: Boolean) : City!
+
+        addCity(id: ID!, name: String!, population: Int!, coordinates: String!, country: String!) : City!
         deleteCity(id: ID): City!
-        updateCity(id: ID!, name: String!, population: Int!, coordinates: String!, addCountry: ID, isCapital: Boolean): City!
-    
+        updateCity(id: ID!, name: String!, population: Int!, coordinates: String!, country: String!) : City!
+
+        addCountry(id: ID!, name: String!, population: Int!, is_democaratic: Boolean, capitalCity: String!) : Country!
+        deleteCountry(id: ID): Country!
+        updateCountry(id: ID!, name: String!, population: Int!, is_democaratic: Boolean, capitalCity: String!): Country!
+
+
+        addRiver(id: ID!, name: String!, length: Int!, city_on_this_river: String!, country_contains_this_river: String!): River!
+        deleteRiver(id: ID!): River!
+        updateRiver(id: ID!, name: String!, length: Int!, city_on_this_river: String!, country_contains_this_river: String!): River!
     }
     `
 );
@@ -216,6 +240,8 @@ var schema = buildSchema(`
 //root resolvers это точка входа в запрос (принимает аргумент, делает запрос, возвращает объект)
 var root = {
 
+    //TODO: implement resolvers
+    
     //queries functions
     readOneCity: ({ id }) => {
     const cityModel = getCorrectModelObject(models, "City");
@@ -243,7 +269,7 @@ var root = {
     }
 
     //mutation functions
-    
+
 };
 
 app.use(
