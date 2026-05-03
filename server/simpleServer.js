@@ -39,6 +39,7 @@ app.post('/:functionType/:value', async(req, res) => {
     
     const functionType = req.params.functionType;
     const value = req.params.value;
+    const returnValue = undefined;
 
     switch(functionType){
         case "convertCelsiusFarenheit": res.status(200).json(convertCelciusFarenheit(Number.parseFloat(value)));

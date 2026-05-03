@@ -70,7 +70,6 @@ class DbHandler{
                 filterStatement += (fields[i] + search.operator + values[i]);
             }
         }
-
         var sql = `SELECT * FROM ${model.toUpperCase()} ${filterStatement} ORDER BY ${search.by.toLowerCase()} ${search.type.toUpperCase()};`
         return this.#loadDb(sql);
     }

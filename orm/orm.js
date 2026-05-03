@@ -13,7 +13,7 @@ class Model{
     }
 
     //returns model object
-    search(search, order){
+    search(search){
         return this.db.search(this.constructor.name, search);
     }
 
@@ -62,16 +62,12 @@ class City extends Model{
             throw new Error("invalid population");
         }else{
             const country = this.db.search("Country",
-                            {name: record.country_name},
-                            {by: "name",
-                                type: "desc"});
+                            {name: record.country_name, operator:"=", by: "name", type: "desc"});
             if(!country){
                 throw new Error("country not found");
             }
             const city = this.db.search("City",
-                            {coordinates: record.coordinates},
-                            {by: "name",
-                                type: "desc"});
+                            {coordinates: record.coordinates, by: "name", type: "desc"});
 
             if(city){
                 throw new Error("city already exists");
@@ -158,9 +154,7 @@ class Country extends Model {
             throw new Error("invalid population");
         }else{
             const country = this.db.search("Country",
-                            {name: record.name},
-                            {by: "name",
-                                type: "desc"});
+                            {name: record.name, operator: "=", by: "name", type: "desc"});
             if(country){
                 throw new Error("country country already exists");
             }
@@ -196,8 +190,8 @@ class Country extends Model {
 
     //Relationship HAS_RIVER
     addRiverToCountry(idCountry, idRiver){
-        const country = this.db.search("Country", {id: idCountry}, {by: "name", type: "desc"});
-        const river = this.db.search("River", {id:idRiver}, {by: "name", type: "desc"});
+        const country = this.db.search("Country", {id: idCountry, by: "name", type: "desc"});
+        const river = this.db.search("River", {id:idRiver, by: "name", type: "desc"});
 
         if (!country){
             throw new Error("there is no such country")
@@ -215,8 +209,8 @@ class Country extends Model {
 
     //Relationship CAPITAL
     addCapital(idCity, idCountry){
-        const country = this.db.search("Country", {id: idCountry}, {by: "name", type: "desc"});
-        const city = this.db.search("City", {id:idCity}, {by: "name", type: "desc"});
+        const country = this.db.search("Country", {id: idCountry, by: "name", type: "desc"});
+        const city = this.db.search("City", {id:idCity, by: "name", type: "desc"});
 
         if (!country){
             throw new Error("there is no such country")
@@ -233,7 +227,7 @@ class Country extends Model {
     }
 
     updateCapital(idCity, idCountry){
-        const country = this.db.search("Country", {id: idCountry}, {by: "name", type: "desc"});
+        const country = this.db.search("Country", {id: idCountry, by: "name", type: "desc"});
         const city = this.db.search("City", {id:idCity, by: "name", type: "desc"});
 
         if (!country){
@@ -284,10 +278,9 @@ class River extends Model {
         }else{
             const river = this.db.search("River",
                             {name: record.name,
-                            length: record.length
-                            },
-                            {by: "name",
-                                type: "desc"});
+                            length: record.length,
+                            by: "name",
+                            type: "desc"});
             if(river){
                 throw new Error("river already exists");
             }

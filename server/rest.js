@@ -14,9 +14,12 @@ app.use(express.json());
 
 app.post('/create/:modelname', async(req, res) => {
     const modelName = normalize(req.params.modelname);
+    console.log(modelName);
     const body = req.body;
+    console.log(body);
     try {
         const modelObj = getCorrectModelObject(models, modelName);
+        console.log(modelObj);
         modelObj.createOne(body);
         res.status(200).json(body);
     }catch(error){
@@ -143,7 +146,10 @@ app.listen(3000, () => {
 
 
 function normalize(string){
+    
+    console.log(string);
     const lowercased = string.toLowerCase();
+    console.log(lowercased);
     return lowercased.charAt(0).toUpperCase() + lowercased.slice(1);
 }
 
@@ -156,3 +162,4 @@ function getCorrectModelObject(modelsArr, modelName){
     }
     throw new Error("Model not found");
 }
+
