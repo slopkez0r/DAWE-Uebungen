@@ -163,3 +163,95 @@ function getCorrectModelObject(modelsArr, modelName){
     throw new Error("Model not found");
 }
 
+
+// GRAPH QL
+var {graphqlHTTP} = require("graphql-http");
+var {buildSchema} = require("graphql");
+
+
+// schema using graphql schema language
+var schema = buildSchema(`
+    type City{
+        id: ID!
+        name: String!
+        population: Int!
+        coordinates: String!
+        country: Country!
+        rivers: [River]
+    }
+
+    type Country{
+        id: ID!
+        name: String!
+        is_democratic: Boolean!
+        population: Int!
+        capital: City!
+        cities: [City]
+        rivers: [River]
+    }
+
+    type River{
+        id: ID!
+        name: String!
+        length: Int!
+        countries: [Country]
+        cities: [City]
+    }
+    
+    type Query{
+        readOneCity(id: ID!) : City!
+        readOneRiver(id: ID!) : River!
+        readOneCountry(id: ID) : Country!
+    }
+
+    type Mutation{
+        addCity(id: ID!, name: String!, population: Int!, coordinates: String!, addCountry: ID, isCapital: Boolean) : City!
+        deleteCity(id: ID): City!
+        updateCity(id: ID!, name: String!, population: Int!, coordinates: String!, addCountry: ID, isCapital: Boolean): City!
+    
+    }
+    `
+);
+
+//root resolvers это точка входа в запрос (принимает аргумент, делает запрос, возвращает объект)
+var root = {
+
+    //queries functions
+    readOneCity: ({ id }) => {
+    const cityModel = getCorrectModelObject(models, "City");
+    const countryModel = getCorrectModelObject(models, "Country");
+
+    const city = cityModel.readOne(Number(id));
+
+    //field resolvers - обработчики вложенных полей объекта
+    return {
+        ...city, //alle andere felder
+        country: () => {
+            return countryModel.readOne(city.country_id);
+        }
+    };
+    },
+
+    readOneCountry: ({ id }) => {
+        const countryModel = getCorrectModelObject(models, "Country");
+        return countryModel.readOne(Number(id));
+    },
+
+    readOneRiver: ({ id }) => {
+        const riverModel = getCorrectModelObject(models, "River");
+        return riverModel.readOne(Number(id));
+    }
+
+    //mutation functions
+    
+};
+
+app.use(
+    "/graphql",
+    graphqlHTTP({
+        schema: schema,
+        rootValue: root,
+        grpahiql: true,
+    })
+);
+
