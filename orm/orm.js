@@ -1,3 +1,4 @@
+const console = require("console");
 const DbHandler = require("./shandler");
 const path = require("path");
 const db = new DbHandler(path.join(__dirname, "../db/dawe_db.db"));
@@ -338,8 +339,16 @@ class River extends Model {
         return true;
     }
 
-    getCities(river_id, country_id){
-        const cities_id = this.db.search("Located")
+    getCities(river_id){
+        const rivers = Object.values(this.db.searchMany("LOCATED_ON", {river_id: river_id, operator: "=", by: "river_id", type: "desc"}));
+        
+        var cities = [];
+        
+        for(var i = 0; i < rivers.length;  i++){
+            cities.push(this.db.search("City", {id: rivers[i].city_id, operator: "=", by: "name", type: "desc"}));
+        }
+        
+        return cities;
     }
 }
 
@@ -363,7 +372,10 @@ const bonn_id = city.search({name:"Bonn"},
     }
 ).id;
 country.updateCapital(bonn_id, germany.id);
-*/
 
-const country = new Country(db);
-const rivers = country.getRivers(1);
+
+const river = new River(db);
+const cities_rhine = river.getCities(2);
+
+console.log(cities_rhine);
+*/
