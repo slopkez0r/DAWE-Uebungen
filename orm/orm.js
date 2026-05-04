@@ -18,6 +18,10 @@ class Model{
         return this.db.search(this.constructor.name, search);
     }
 
+    searchMany(search){
+        return this.db.searchMany(this.constructor.name, search);
+    }
+
     updateOne(record){
         if(this.validateForUpdate(record)){
             this.db.updateOne(this.constructor.name, record);
