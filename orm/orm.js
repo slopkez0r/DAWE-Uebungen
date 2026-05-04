@@ -282,6 +282,10 @@ class Country extends Model {
         return rivers_arr;
     }
 
+    getCities(idCountry){
+        return Object.values(this.db.searchMany("City", {country_id: idCountry, operator: "=", by: "id", type: "asc"}));
+    }
+
 }
 
 //RIVER
@@ -379,3 +383,6 @@ const cities_rhine = river.getCities(2);
 
 console.log(cities_rhine);
 */
+
+const germany = new Country(db);
+germany.getCities(1);
