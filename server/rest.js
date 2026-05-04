@@ -291,6 +291,36 @@ var root = {
                 return riverModel.getCities(Number(id));
             }
         };
+    },
+
+    //search functions
+    searchCity: ({search}) => {
+        
+        const cityModel = getCorrectModelObject(models, "City");
+        const countryModel = getCorrectModelObject(models, "Country");
+        const riverModel = getCorrectModelObject(models, "River");
+
+        const queryObj = {
+            [search.field]: search.value,
+            operator: search.operator,
+            by: search.by,
+            type: search.type
+        };
+        
+        const foundCities = Object.values(cityModel.searchMany(queryObj));
+        const citiesToReturn = [];
+
+        return foundCities.map((city) => {
+            return {
+                ...city,
+                country: () => {
+                    return countryModel.readOne(Number(city.country_id));
+                },
+                rivers: () => {
+                    return cityModel.getRivers(Number(city.id));
+                }
+            };
+        });
     }
 
     //mutation functions
