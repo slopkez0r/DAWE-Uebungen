@@ -254,6 +254,9 @@ var root = {
         ...city, //alle andere felder
         country: () => {
             return countryModel.readOne(city.country_id);
+        },
+        rivers: () => {
+            
         }
     };
     },
