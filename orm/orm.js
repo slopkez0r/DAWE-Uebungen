@@ -270,6 +270,17 @@ class Country extends Model {
         const placed = this.db.updateOne("CAPITAL", record);
     }
 
+    getRivers(idCountry){
+        const rivers = Object.values(this.db.searchMany("HAS_RIVER", {country_id: idCountry, operator: "=", by: "country_id", type: "desc"}));
+        var rivers_arr = [];
+
+        for(var i = 0; i<rivers.length; i++){
+            rivers_arr.push(this.db.search("River", {id: rivers[i].id, operator: "=", by: "name", type:"desc"}));
+        }
+
+        return rivers_arr;
+    }
+
 }
 
 //RIVER
@@ -354,5 +365,5 @@ const bonn_id = city.search({name:"Bonn"},
 country.updateCapital(bonn_id, germany.id);
 */
 
-const city = new City(db);
-const rivers = city.getRivers(7);
+const country = new Country(db);
+const rivers = country.getRivers(1);
