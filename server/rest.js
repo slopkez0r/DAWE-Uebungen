@@ -251,24 +251,46 @@ var root = {
 
     //field resolvers - обработчики вложенных полей объекта
     return {
-        ...city, //alle andere felder
-        country: () => {
-            return countryModel.readOne(city.country_id);
-        },
-        rivers: () => {
-            
-        }
-    };
+            ...city, //alle andere felder
+            country: () => {
+                return countryModel.readOne(Number(city.country_id));
+                },
+            rivers: () => {
+                return cityModel.getRivers(Number(city.id));
+            }
+        };
     },
 
     readOneCountry: ({ id }) => {
         const countryModel = getCorrectModelObject(models, "Country");
-        return countryModel.readOne(Number(id));
+        const country = countryModel.readOne(Number(id))
+        return {
+            ...country,
+            capital: () => {
+                return countryModel.getCapital(Number(country.id));
+            },
+            cities: () => {
+                return countryModel.getCities(Number(country.id));
+            },
+            rivers: () => {
+                return countryModel.getRivers(Number(country.id));
+            }
+
+        };
     },
 
     readOneRiver: ({ id }) => {
         const riverModel = getCorrectModelObject(models, "River");
-        return riverModel.readOne(Number(id));
+        const river = riverModel.readOne(Number(id));
+        return {
+            ...river,
+            countries: () => {
+                return riverModel.getCountries(Number(id));
+            },
+            cities: () => {
+                return riverModel.getCities(Number(id));
+            }
+        };
     }
 
     //mutation functions
