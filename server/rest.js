@@ -167,6 +167,7 @@ function getCorrectModelObject(modelsArr, modelName){
 // GRAPH QL
 var {graphqlHTTP} = require("graphql-http");
 var {buildSchema} = require("graphql");
+const { getDefaultHighWaterMark } = require("stream");
 
 
 // schema using graphql schema language
@@ -221,16 +222,16 @@ var schema = buildSchema(`
 
     type Mutation{
 
-        addCity(id: ID!, name: String!, population: Int!, coordinates: String!, country: String!) : City!
+        addCity(name: String!, population: Int!, coordinates: String!, country: String!) : City!
         deleteCity(id: ID): City!
         updateCity(id: ID!, name: String!, population: Int!, coordinates: String!, country: String!) : City!
 
-        addCountry(id: ID!, name: String!, population: Int!, is_democaratic: Boolean, capitalCity: String!) : Country!
+        addCountry(name: String!, population: Int!, is_democaratic: Boolean, capitalCity: String!) : Country!
         deleteCountry(id: ID): Country!
         updateCountry(id: ID!, name: String!, population: Int!, is_democaratic: Boolean, capitalCity: String!): Country!
 
 
-        addRiver(id: ID!, name: String!, length: Int!, city_on_this_river: String!, country_contains_this_river: String!): River!
+        addRiver(name: String!, length: Int!, city_on_this_river: String!, country_contains_this_river: String!): River!
         deleteRiver(id: ID!): River!
         updateRiver(id: ID!, name: String!, length: Int!, city_on_this_river: String!, country_contains_this_river: String!): River!
     }
@@ -373,11 +374,30 @@ var root = {
             };
 
         });
-    }
-
-    
+    },
 
     //mutation functions
+    addCity: ({name, population, coordinates, country}) => {
+        
+        const cityModel = getCorrectModelObject(models, "City");
+        return cityModel.createOne(name, coordinates, population, country);
+    },
+
+    addCountry: ({name, population, is_democratic, capitalCity}) => {
+    
+        const cityModel = getCorrectModelObject(models, "City");
+        const countryModel = getCorrectModelObject(models, "Country");
+        
+        countryModel.createOne(name, population, is_democratic);
+
+        const country = countryModel.search("Country", {name: name, operator: "=", by: "id", type: "desc"});
+
+        const city = cityModel.search("City", {name: name, operator: "=", by: "id", type: "desc"});
+
+        countryModel.addCapital(country.id, city.id);
+
+        return country;
+    }
 
 };
 
