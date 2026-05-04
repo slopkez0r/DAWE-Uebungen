@@ -354,6 +354,18 @@ class River extends Model {
         
         return cities;
     }
+
+    getCountries(river_id){
+        const rivers = Object.values(this.db.searchMany("HAS_RIVER", {river_id: river_id, operator: "=", by: "river_id", type: "desc"}));
+        
+        var countries = [];
+        
+        for(var i = 0; i < rivers.length;  i++){
+            countries.push(this.db.search("Country", {id: rivers[i].country_id, operator: "=", by: "name", type: "desc"}));
+        }
+        
+        return countries;
+    }
 }
 
 module.exports = [Model, City, Country, River];
@@ -382,7 +394,9 @@ const river = new River(db);
 const cities_rhine = river.getCities(2);
 
 console.log(cities_rhine);
-*/
+
 
 const germany = new Country(db);
 germany.getCities(1);
+
+*/
