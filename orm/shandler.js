@@ -74,6 +74,25 @@ class DbHandler{
         return this.#loadDb(sql);
     }
 
+    searchMany(model, search){
+        const fields = Object.keys(search);
+        const values = Object.values(search).map((x) => this.#checktype(x));
+        var filterStatement = "WHERE ";
+
+        for(var i = 0; i<fields.length; i++){
+            if((fields[i] != "operator") && (fields[i]!="by") && (fields[i]!="type")){
+                if(i>0){
+                filterStatement += " AND ";
+                }
+                filterStatement += (fields[i] + search.operator + values[i]);
+            }
+        }
+        var sql = `SELECT * FROM ${model.toUpperCase()} ${filterStatement} ORDER BY ${search.by.toLowerCase()} ${search.type.toUpperCase()};`
+        return this.#loadDbMany(sql);
+    }
+    
+    //#-private
+    
     #loadDb(sql){
         console.log(sql);
         const db = new Database(this.db_path, { readonly: true });
@@ -97,6 +116,15 @@ class DbHandler{
             case "boolean": return value == true ? 1 : 0;
             case "object": return null;
         }
+    }
+
+    #loadDbMany(sql){
+        console.log(sql);
+        const db = new Database(this.db_path, {readonly: true});
+        const result = db.prepare(sql).all();
+        console.log(result);
+        db.close();
+        return result;
     }
 }
 
