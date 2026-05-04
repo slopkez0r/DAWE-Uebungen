@@ -349,6 +349,30 @@ var root = {
                 }
             };
         });
+    },
+
+    searchRiver:({search}) => {
+        const riverModel = getCorrectModelObject(models, "River");
+        const queryObj = {
+            [search.field]: search.value,
+            operator: search.operator,
+            by: search.by,
+            type: search.type
+        }
+
+        const foundRivers = Object.values(riverModel.searchMany(queryObj));
+        return foundRivers.map((river) => {
+            return {
+                ...river,
+                countries: () => {
+                    return riverModel.getCountries(river.id)
+                },
+                cities: () => {
+                    return riverModel.getCities(river.id)
+                }
+            };
+
+        });
     }
 
     
