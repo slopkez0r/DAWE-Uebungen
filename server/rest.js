@@ -308,7 +308,6 @@ var root = {
         };
         
         const foundCities = Object.values(cityModel.searchMany(queryObj));
-        const citiesToReturn = [];
 
         return foundCities.map((city) => {
             return {
@@ -321,7 +320,38 @@ var root = {
                 }
             };
         });
+    },
+
+    searchCountry: ({search}) => {
+        
+        const countryModel = getCorrectModelObject(models, "Country");
+
+        const queryObj = {
+            [search.field]: search.value,
+            operator: search.operator,
+            by: search.by,
+            type: search.type
+        };
+        
+        const foundCountries = Object.values(countryModel.searchMany(queryObj));
+
+        return foundCountries.map((country) => {
+            return {
+                ...country,
+                capital: () => {
+                    return countryModel.getCapital(country.id);
+                },
+                cities:() => {
+                    return countryModel.getCities(country.id);
+                },
+                rivers: () => {
+                    return countryModel.getRivers(Number(city.id));
+                }
+            };
+        });
     }
+
+    
 
     //mutation functions
 
