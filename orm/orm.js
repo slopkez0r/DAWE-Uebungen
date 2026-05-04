@@ -67,7 +67,7 @@ class City extends Model{
                 throw new Error("country not found");
             }
             const city = this.db.search("City",
-                            {coordinates: record.coordinates, by: "name", type: "desc"});
+                            {coordinates: record.coordinates, operator: "=", by: "name", type: "desc"});
 
             if(city){
                 throw new Error("city already exists");
@@ -107,8 +107,8 @@ class City extends Model{
     //relationship located on
 
     placeCityOnRiver(idCity, idRiver){
-        const city = this.db.search("City", {id: idCity, by: "name", type: "desc"});
-        const river = this.db.search("River", {id: idRiver, by: "name", type: "desc"});
+        const city = this.db.search("City", {id: idCity, operator: "=", by: "name", type: "desc"});
+        const river = this.db.search("River", {id: idRiver, operator: "=", by: "name", type: "desc"});
 
         if (!city){
             throw new Error("there is no such city")
@@ -190,8 +190,8 @@ class Country extends Model {
 
     //Relationship HAS_RIVER
     addRiverToCountry(idCountry, idRiver){
-        const country = this.db.search("Country", {id: idCountry, by: "name", type: "desc"});
-        const river = this.db.search("River", {id:idRiver, by: "name", type: "desc"});
+        const country = this.db.search("Country", {id: idCountry, operator: "=", by: "name", type: "desc"});
+        const river = this.db.search("River", {id:idRiver, operator: "=", by: "name", type: "desc"});
 
         if (!country){
             throw new Error("there is no such country")
@@ -209,8 +209,8 @@ class Country extends Model {
 
     //Relationship CAPITAL
     addCapital(idCity, idCountry){
-        const country = this.db.search("Country", {id: idCountry, by: "name", type: "desc"});
-        const city = this.db.search("City", {id:idCity, by: "name", type: "desc"});
+        const country = this.db.search("Country", {id: idCountry, operator: "=", by: "name", type: "desc"});
+        const city = this.db.search("City", {id:idCity, operator: "=", by: "name", type: "desc"});
 
         if (!country){
             throw new Error("there is no such country")
@@ -226,9 +226,16 @@ class Country extends Model {
         });
     }
 
+    getCapital(idCountry){
+        const capitalId = this.db.search("Capital", {country_id: idCountry, operator: "=", by: "id", type: "desc"}).capital_city_id;
+        const capital = this.db.search("City", {id: capitalId, operator: "=", by: "name", type: "desc"});
+
+        return capital
+    }
+
     updateCapital(idCity, idCountry){
-        const country = this.db.search("Country", {id: idCountry, by: "name", type: "desc"});
-        const city = this.db.search("City", {id:idCity, by: "name", type: "desc"});
+        const country = this.db.search("Country", {id: idCountry, operator: "=", by: "name", type: "desc"});
+        const city = this.db.search("City", {id:idCity, operator: "=", by: "name", type: "desc"});
 
         if (!country){
             throw new Error("there is no such country")
@@ -238,7 +245,7 @@ class Country extends Model {
             throw new Error("there is no such city")
         }
 
-        const capital_id = this.db.search("Capital", {country_id: idCountry, by: "country_id", type: "desc"}).id;
+        const capital_id = this.db.search("Capital", {country_id: idCountry, operator: "=", by: "country_id", type: "desc"}).id;
 
         const record = {
             id: capital_id,
@@ -308,15 +315,14 @@ class River extends Model {
 
 module.exports = [Model, City, Country, River];
 
-/*
 const country = new Country(db);
-const germany = country.search({name: "Germany"},
-    {
-        by: "name",
-        type: "desc"
-    }
-);
+const germany = country.search({name: "Germany",operator: "=",by: "name",type: "desc"});
 
+const capital = country.getCapital(germany.id);
+
+console.log(capital);
+
+/*
 const bonn = city.createOne("Bonn", "123123", 340226, "Germany");
 
 const city = new City(db);
