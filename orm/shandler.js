@@ -13,9 +13,7 @@ class DbHandler{
         const values = Object.values(record).map((x) => this.#checktype(x)).join(", ");
 
         const sql = `INSERT INTO ${model_name.toUpperCase()} (${columns}) VALUES (${values});`;
-
         this.#persistDb(sql);
-
     }
 
     readOne(model_name, id){
@@ -25,7 +23,9 @@ class DbHandler{
 
     deleteOne(model_name, id){
         const sql = `DELETE FROM ${model_name.toUpperCase()} WHERE id = ${id};`;
+        const deletedobj = this.readOne(model_name, id);
         this.#persistDb(sql);
+        return deletedobj;
     }
 
     updateOne(model_name, record){

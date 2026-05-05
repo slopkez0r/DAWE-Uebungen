@@ -31,7 +31,7 @@ class Model{
     }
 
     deleteOne(id){
-        this.db.deleteOne(this.constructor.name, id);
+        return this.db.deleteOne(this.constructor.name, id);
     }
 }
 
@@ -56,10 +56,11 @@ class City extends Model{
                 population: record.population,
                 country_id: country_id
             });
+            return this.db.search("City", {name: record.name, operator: "=", by: "name", type: "desc"});
+
         }catch(err){
             console.log(err.message);
         }
-
     }
 
     validateForCreate(record){
@@ -159,6 +160,7 @@ class Country extends Model {
                 is_democratic: record.is_democratic,
                 population: record.population
             });
+            return this.db.search("Country", {name: record.name, operator: "=", by: "name", type: "desc"});
         }catch(err){
             console.log(err.message);
         }
@@ -229,6 +231,8 @@ class Country extends Model {
 
     //Relationship CAPITAL
     addCapital(idCity, idCountry){
+        idCity = Number(idCity);
+        idCountry = Number(idCountry);
         const country = this.db.search("Country", {id: idCountry, operator: "=", by: "name", type: "desc"});
         const city = this.db.search("City", {id:idCity, operator: "=", by: "name", type: "desc"});
         if (!country){
@@ -307,6 +311,7 @@ class River extends Model {
                 name: record.name,
                 length: record.length
             });
+            return this.db.search("River", {name: record.name, operator: "=", by: "name", type: "desc"});
         }catch(err){
             console.log(err.message);
         }

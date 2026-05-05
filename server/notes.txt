@@ -1,0 +1,132 @@
+#how to use graphiql
+http://localhost:3000/graphql
+
+#query example with reads
+
+{
+  readOneCity(id: 1) {
+    id
+    name
+    population
+    coordinates
+  }
+  
+  readOneRiver(id:1) {
+    id,
+    name,
+    length,
+    countries {
+      name,
+      population
+    },
+    cities{
+      name,
+      population
+    }
+  }
+  
+  readOneCountry(id:1){
+    id,
+    name,
+    is_democratic,
+    population,
+    capital {
+      name,
+      population
+    },
+    cities{
+      name, 
+      population
+    },
+    rivers{
+      name,
+      length
+    }
+  }
+  
+}
+
+#example query delete country
+
+mutation {
+  deleteCountry(id: 5){
+    name,
+    population
+  }
+}
+
+response
+{
+  "data": {
+    "deleteCountry": {
+      "name": "North Korea",
+      "population": 25600000
+    }
+  }
+}
+
+#example query search
+
+query {
+  searchCountry(search: {
+    field: "name"
+    value: "Russia"
+    operator: "="
+    by: "id"
+    type: "desc"
+  }) {
+    id
+    name
+    population
+    is_democratic
+  }
+}
+
+
+#example query: Create country russia, add capital Moscow, add city Yekaterinburg, read all cities of country
+
+#add capital and country
+mutation {
+  addCountry(name: "Russia", is_democratic: false, population: 140000000, capitalCity: {name: "Moscow", population: 12000000, coordinates: "(55.751244,37.618423)"}) {
+    name
+    is_democratic
+    population
+    capital {
+      name
+      population
+    }
+  }
+}
+
+#add city
+
+mutation {
+  addCity(name: "Yekateruinburg", population: 1200000, coordinates: "565008N603646E", country: "Russia"){
+    name,
+    population,
+  }
+}
+
+#read country with all fields
+
+query{
+  readOneCountry(id:5){
+    name,
+    is_democratic,
+    population,
+    capital{
+      name,
+      population,
+      coordinates
+    },
+    cities{
+      name,
+      population,
+      coordinates
+    },
+    rivers{
+      name,
+      length
+    }
+  }
+}

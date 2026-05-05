@@ -140,9 +140,6 @@ app.delete('/delete/:modelname/:id', async(req, res) => {
     }
 });
 
-app.listen(3000, () => {
-    console.log("Server is listening on localhost");
-});
 
 
 function normalize(string){
@@ -165,10 +162,8 @@ function getCorrectModelObject(modelsArr, modelName){
 
 
 // GRAPH QL
-var {graphqlHTTP} = require("graphql-http");
-var {buildSchema} = require("graphql");
-const { getDefaultHighWaterMark } = require("stream");
-
+const { graphqlHTTP } = require('express-graphql');
+const { buildSchema } = require('graphql');
 
 // schema using graphql schema language
 var schema = buildSchema(`
@@ -206,6 +201,12 @@ var schema = buildSchema(`
         by: String
         type: String
     }
+
+    input CityInput {
+        name: String!
+        population: Int!
+        coordinates: String!
+    }
     
     type Query{
 
@@ -226,8 +227,10 @@ var schema = buildSchema(`
         deleteCity(id: ID): City!
         updateCity(id: ID!, name: String, population: Int, coordinates: String, country_id: ID) : City!
 
-        addCountry(name: String!, population: Int!, is_democaratic: Boolean, capitalCity: String!) : Country!
+        addCountry(name: String!, population: Int!, is_democratic: Boolean, capitalCity: CityInput) : Country!
         deleteCountry(id: ID): Country!
+        
+        # in update country change capitalCity string to cityinput
         updateCountry(id: ID!, name: String!, population: Int!, is_democaratic: Boolean, capitalCity: String!): Country!
 
 
@@ -381,7 +384,18 @@ var root = {
     addCity: ({name, population, coordinates, country}) => {
         
         const cityModel = getCorrectModelObject(models, "City");
-        return cityModel.createOne(name, coordinates, population, country);
+        const city = cityModel.createOne(
+            {name: name,
+            coordinates: coordinates,
+            population: population,
+            country_name: country
+        }) 
+        
+        return {
+            ... city,
+            rivers: cityModel.getRivers(city.id)
+
+        };
     },
 
     addCountry: ({name, population, is_democratic, capitalCity}) => {
@@ -389,15 +403,36 @@ var root = {
         const cityModel = getCorrectModelObject(models, "City");
         const countryModel = getCorrectModelObject(models, "Country");
         
-        countryModel.createOne(name, population, is_democratic);
+        countryModel.createOne({name, population, is_democratic});
 
-        const country = countryModel.search("Country", {name: name, operator: "=", by: "id", type: "desc"});
+        const country = countryModel.search({name: name, operator: "=", by: "id", type: "desc"});
+        console.log(country.name);
 
-        const city = cityModel.search("City", {name: name, operator: "=", by: "id", type: "desc"});
+        var city = cityModel.search({name: capitalCity.name, operator: "=", by: "id", type: "desc"});
 
-        countryModel.addCapital(country.id, city.id);
+        if(!city){
+            city = cityModel.createOne({
+                name: capitalCity.name,
+                population: capitalCity.population,
+                coordinates: capitalCity.coordinates,
+                country_name: country.name
+            });
+        }
+        console.log(city.id);
+        countryModel.addCapital(city.id, country.id);
 
-        return country;
+        return {
+            ...country,
+            capital: () => {
+                return countryModel.getCapital(Number(country.id));
+            },
+            cities: () => {
+                return countryModel.getCities(Number(country.id));
+            },
+            rivers: () => {
+                return countryModel.getRivers(Number(country.id));
+            }
+        };
     },
 
     adddRiver: ({name, length}) => {
@@ -450,22 +485,31 @@ var root = {
         return {
             ...city
         };
-    }
+    },
 
     //update country
+    
     //delete country
+    deleteCountry: ({id}) => {
+        const countryModel = getCorrectModelObject(models, "Country");
+        const deletedCountry = countryModel.deleteOne(Number(id));
+        return{
+            ...deletedCountry
+        };
+    }
 
     //update river
     //delete river
 
 };
 
-app.use(
-    "/graphql",
-    graphqlHTTP({
-        schema: schema,
-        rootValue: root,
-        grpahiql: true,
-    })
-);
+app.use('/graphql', graphqlHTTP({
+  schema: schema,
+  rootValue: root,
+  // Enable the GraphiQL interface for testing
+  graphiql: true,
+}))
 
+app.listen(3000, () => {
+    console.log("Server is listening on localhost");
+});
