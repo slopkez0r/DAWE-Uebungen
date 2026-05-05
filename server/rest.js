@@ -224,7 +224,7 @@ var schema = buildSchema(`
 
         addCity(name: String!, population: Int!, coordinates: String!, country: String!) : City!
         deleteCity(id: ID): City!
-        updateCity(id: ID!, name: String!, population: Int!, coordinates: String!, country: String!) : City!
+        updateCity(id: ID!, name: String, population: Int, coordinates: String, country_id: ID) : City!
 
         addCountry(name: String!, population: Int!, is_democaratic: Boolean, capitalCity: String!) : Country!
         deleteCountry(id: ID): Country!
@@ -377,6 +377,7 @@ var root = {
     },
 
     //mutation functions
+    //add
     addCity: ({name, population, coordinates, country}) => {
         
         const cityModel = getCorrectModelObject(models, "City");
@@ -397,7 +398,65 @@ var root = {
         countryModel.addCapital(country.id, city.id);
 
         return country;
+    },
+
+    adddRiver: ({name, length}) => {
+        const riverModel = getCorrectModelObject(models, "River");
+        return riverModel.createOne(name, length);
+    },
+
+    //update
+    updateCity: ({ id, name, population, coordinates, country_id }) => {
+        const cityModel = getCorrectModelObject(models, "City");
+
+        const record = { id: Number(id) };
+
+        if (name !== undefined) {
+            record.name = name;
+        }
+
+        if (population !== undefined) {
+            record.population = population;
+        }
+
+        if (coordinates !== undefined) {
+            record.coordinates = coordinates;
+        }
+
+        if (country_id !== undefined) {
+            record.country_id = Number(country_id);
+        }
+
+        cityModel.updateOne(record);
+
+        const city = cityModel.readOne(Number(id));
+        const countryModel = getCorrectModelObject(models, "Country");
+
+        return {
+            ...city,
+            country: () => {
+                return countryModel.readOne(Number(city.country_id));
+            },
+            rivers: () => {
+                return cityModel.getRivers(Number(city.id));
+            }
+        };
+    },
+
+    deleteCity: ({id}) => {
+        const cityModel = getCorrectModelObject(models, "City");
+        const city = cityModel.readOne(Number(id));
+        cityModel.deleteOne("City", id);
+        return {
+            ...city
+        };
     }
+
+    //update country
+    //delete country
+
+    //update river
+    //delete river
 
 };
 
