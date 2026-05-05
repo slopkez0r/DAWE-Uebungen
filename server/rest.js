@@ -182,7 +182,7 @@ var schema = buildSchema(`
         is_democratic: Boolean!
         population: Int!
         capital: City!
-        cities: [City]
+        cities(minPopulation: Int): [City]
         rivers: [River]
     }
 
@@ -231,7 +231,7 @@ var schema = buildSchema(`
         deleteCountry(id: ID): Country!
         
         # in update country change capitalCity string to cityinput
-        updateCountry(id: ID!, name: String!, population: Int!, is_democaratic: Boolean, capitalCity: String!): Country!
+        updateCountry(id: ID!, name: String, population: Int, is_democaratic: Boolean, capitalCity: String): Country!
 
 
         addRiver(name: String!, length: Int!, city_on_this_river: String!, country_contains_this_river: String!): River!
@@ -488,7 +488,41 @@ var root = {
     },
 
     //update country
-    
+    updateCountry: ({id, name, is_democratic, population}) => {
+        const countryModel = getCorrectModelObject(models, "Country");
+
+        const record = {id: Number(id)};
+
+        if (name !== undefined){record.name = name;}
+
+        if (population !== undefined){record.population = population;}
+
+        if (is_democratic !==undefined){record.is_democratic = is_democratic;}
+        
+        countryModel.updateOne(record)
+
+        const country = countryModel.readOne(Number(id));
+
+        return {
+            ...country,
+            capital: () => {
+                countryModel.getCapital()
+            },
+            cities: ({ minPopulation }) => {
+                const cities = countryModel.getCities(Number(country.id));
+
+                if (minPopulation !== undefined) {
+                    return cities.filter(c => c.population > minPopulation);
+                }
+
+                return cities;
+            },
+            rivers: () => {
+                countryModel.getRivers()
+            }
+        };
+    },
+
     //delete country
     deleteCountry: ({id}) => {
         const countryModel = getCorrectModelObject(models, "Country");
