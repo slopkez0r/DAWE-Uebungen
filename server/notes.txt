@@ -130,3 +130,71 @@ query{
     }
   }
 }
+
+
+
+#example update country
+mutation {
+  updateCountry(id: 1, population: 82000000){
+    name,
+    population
+  }
+}
+
+#example get all cities filtered by population
+
+mutation {
+  updateCountry(id: 1, population: 84000000) {
+    name
+    cities(minPopulation: 750000) {
+      name
+      population
+    }
+  }
+}
+
+
+3. Exercise:
+
+How does the GraphiQL IDE know the schema?
+
+> GraphiQL uses GraphQL introspection to query the schema from the server an display it
+
+introspection - самоописание, сервер может описать себя
+
+4. Exercise:
+
+What is the purpose of the following elements un GraphQL?
+
+> fragment - ein code snippet für wiederverwendung in queries (ziel ist die selbstwiederholungen zu vermeiden)
+bsp:
+  fragment CityFields on City {
+    name
+    population
+  }
+
+  query {
+    readOneCity(id: 1) {
+      ...CityFields
+    }
+    readOneCity(id: 2) {
+      ...CityFields
+    }
+  }
+
+> directive - sind verwendet für die änderungen an ausführung von queries, z.b include or skip fields
+bsp.
+  query {
+    readOneCity(id: 1) {
+      name
+      population @include(if: true)
+    }
+  }
+
+> subscription - client kann die live updates vom server abonieren. Dafür wird websocket verwendet und nicht http
+bsp.
+  subscription {
+    cityAdded {
+      name
+    }
+  }
