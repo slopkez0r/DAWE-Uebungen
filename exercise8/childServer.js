@@ -45,7 +45,7 @@ class ChildServer{
         });
 
         //Search
-        this.app.post('/search/jsonBody', async(req, res) =>{
+        this.app.post('/search/1/jsonBody', async(req, res) =>{
             const body = req.body;
             try {
                 const result = this.model.search(body);
