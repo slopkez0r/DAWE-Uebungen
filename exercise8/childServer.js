@@ -97,7 +97,8 @@ class ChildServer{
 
 
     listen(port){
-        this.app.listen(port, () => {
+        this.port = port;
+        this.app.listen(this.port, () => {
             console.log(`Server is listening on port: ${port}`)
         });
     }
