@@ -2,6 +2,9 @@ const [Model, City, Country, River] = require("../orm/orm");
 const DbHandler = require("../orm/shandler");
 const path = require("path");
 const express = require("express");
+const fs = require("fs");
+const yaml = require("js-yaml");
+
 var app = express();
 
 const db = new DbHandler(path.join(__dirname, "../db/dawe_db.db"));
@@ -14,7 +17,6 @@ app.use(express.json());
 const port = 3000;
 
 //RECORD
-
 app.post('/create/:modelname', async(req, res) => {
     const modelName = normalize(req.params.modelname);
     console.log(modelName);
@@ -139,3 +141,21 @@ function getCorrectModelObject(modelsArr, modelName){
 app.listen(port, () => {
     console.log(`server is listening on ${port}`);
 });
+
+
+//read yaml
+
+function readYML(){
+    try {
+        const fileContent = fs.readFileSync("./roles_cfg.yaml", "utf8");
+
+        const config = yaml.load(fileContent);
+
+        console.log(config);
+
+    } catch(error) {
+        console.log(error);
+    }
+}
+
+readYML();
