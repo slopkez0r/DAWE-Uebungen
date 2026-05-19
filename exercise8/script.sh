@@ -4,7 +4,7 @@ if [ "$1" = "create" ]; then
 echo "create country bulgaria"
 curl -X POST http://localhost:3000/create/country \
   -H "Content-Type: application/json" \
-  -d '{"name":"Bulgaria","is_democratic":true,"population":6700000}'
+  -d '{"name":"Nigeria","is_democratic":true,"population":6700000}'
 
 fi
 
