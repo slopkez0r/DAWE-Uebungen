@@ -1,0 +1,42 @@
+{
+  aclRules: [
+    //admin role permission
+    {
+      roles: "admin",
+      allows: [{
+        resources: [
+          'role',
+          'user',
+          'role_to_user',
+        ],
+        permissions: '*'
+      }]
+    },
+
+    //model and adapter permissions
+    
+    {
+      roles: "reader",
+      allows: [{
+        resources: [
+          'City',
+          'Country',
+          'River',
+        ],
+        permissions: ['read']
+      }]
+    },
+
+    {
+      roles: "editor",
+      allows: [{
+        resources: [
+          'City',
+          'Country',
+          'River',
+        ],
+        permissions: ['read', 'search', 'create', 'update', 'delete']
+      }]
+    }
+  ]
+}
