@@ -1,10 +1,10 @@
 aclRules:
-  - roles: admin
+  - roles: admin #in diesem fall
     allows:
       - resources:
-          - role
-          - user
-          - role_to_user
+          - City
+          - Country
+          - River
         permissions: "*"
 
   - roles: reader
@@ -16,15 +16,13 @@ aclRules:
         permissions:
           - read
 
-  - roles: editor
+  - roles: cityEditor
     allows:
       - resources:
-          - City
-          - Country
-          - River
-        permissions:
-          - read
-          - search
-          - create
-          - update
-          - delete
+        - City
+      - permissions:
+        - read
+        - create
+        - update
+        - delete
+        - search
