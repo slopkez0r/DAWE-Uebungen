@@ -19,10 +19,10 @@ aclRules:
   - roles: cityEditor
     allows:
       - resources:
-        - City
-      - permissions:
-        - read
-        - create
-        - update
-        - delete
-        - search
+          - City
+        permissions:
+          - read
+          - create
+          - update
+          - delete
+          - search

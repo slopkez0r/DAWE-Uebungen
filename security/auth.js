@@ -79,6 +79,7 @@ class AuthService{
     //authorisierung
     hasPermission(decoded, resource, permission){
         const rule = decoded.allows[0];
+        console.log(rule)
         if((rule.resources.includes(resource) && rule.permissions.includes(permission))||rule.permissions == "*"){
                 return true;
         }
