@@ -50,7 +50,10 @@ class AuthService{
     }
 
     issueToken(role){
-
+        //token besteht aus:
+        //header
+        //payload
+        //verify signature
         for(var rule of this.config.aclRules){
             if(rule.roles == role){
                 const payload = {
@@ -67,6 +70,8 @@ class AuthService{
 
     //authentifizierung
     verifyToken(token){
+
+        //token wurde aus dem authorization header von http erhalten
 
         try{
             const decoded = jwt.verify(token, secret);
