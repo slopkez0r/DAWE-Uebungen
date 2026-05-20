@@ -1,5 +1,5 @@
 aclRules:
-  - roles: admin #in diesem fall
+  - roles: admin
     allows:
       - resources:
           - City
