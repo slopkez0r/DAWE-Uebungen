@@ -3,8 +3,28 @@
     <head>
         <title>GeoDataDashboard</title>
         <link href = "stylesheet.css" rel = "stylesheet">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdn.datatables.net/2.2.1/css/dataTables.dataTables.min.css">
     </head>
     <body>
-        <h1>Hello World</h1>
+        <header>
+            <h1>GeoData-Dashboard</h1>
+        </header>
+
+        <nav>
+                <button class = "model-tab active" data-model = "city"> City</button>  <!--attribute data with access trough dataset-->
+                <button class = "model-tab" data-model = "country">Country</button>
+                <button class = "model-tab" data-model = "river">River</button>
+        </nav>
+        
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.datatables.net/2.2.1/js/dataTables.min.js"></script>
+        <script src = "app.js"></script>
+        
+        <content-card>
+            <table id="table"></table>
+        </content-card>
     </body>
 </html>

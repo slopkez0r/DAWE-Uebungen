@@ -1,0 +1,72 @@
+:root {
+    --background: #0A0E1C;
+    --card-bg: rgba(255, 255, 255, 0.05);
+    --card-border: rgba(255, 255, 255, 0.1);
+    --text-primary: #F5F5F5;
+    --text-secondary: #8A8B8C;
+    --accent: #8B7FFF;
+    --accent-hover: #A89EFF;
+}
+
+body{
+    font-family: "Manpore" sans-serif;
+    color: var(--text-primary);
+    background-image: linear-gradient(to bottom, #000000, #090E1D, #0A0E1C);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    /*height for background*/
+    min-height: 100vh;
+}
+
+content-card {
+    display: flex;
+    background: var(--card-bg);
+    max-width: 1200px;
+    border: 1px solid var(--card-border);
+    border-radius: 6px;
+    padding: 24px;
+    backdrop-filter: blur(15px);
+    margin: 40px auto;
+}
+
+header{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+nav{
+    color: var(--text-secondary);
+    display: flex;
+    gap: 12px;
+    margin: 20px auto;
+
+    /*background-color: red;*/
+}
+
+.model-tab {
+    color: var(--text-secondary);
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 6px;
+    padding: 14px 16px;
+    font-family: "Manrope", sans-serif;
+    cursor: pointer;
+    flex: 1;
+}
+
+.model-tab:hover{
+    color: var(--text-primary);
+    background-color: #8B7FFF99;
+}
+
+.model-tab.active{
+    color: var(--text-primary);
+    background-color: #8B7FFF99;
+}
+
+#table_wrapper {
+    width: 100%;
+}
