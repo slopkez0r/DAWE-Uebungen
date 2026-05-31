@@ -70,3 +70,18 @@ nav{
 #table_wrapper {
     width: 100%;
 }
+
+.button{
+    border-radius: 6px;
+    border: 1px solid var(--card-border);
+}
+
+.button add{
+    background-color: green;
+}
+
+.button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}

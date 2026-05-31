@@ -62,3 +62,6 @@ function createTable(model){
         return table;
         //setInterval(table.ajax.reload, 10000)
 };
+
+
+//TODO: action buttons, refresh & add button, implement popups with CRUD functions except search
