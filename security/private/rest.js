@@ -1,8 +1,8 @@
 
 //IMPORTS
 
-const [Model, City, Country, River] = require("../orm/orm");
-const DbHandler = require("../orm/shandler");
+const [Model, City, Country, River] = require("../../orm/orm");
+const DbHandler = require("../../orm/shandler");
 const path = require("path");
 const express = require("express");
 const fs = require("fs");
@@ -12,13 +12,31 @@ const AuthService = require("./auth");
 
 //INSTANCES
 var app = express();
-const db = new DbHandler(path.join(__dirname, "../db/dawe_db.db"));
+const db = new DbHandler(path.join(__dirname, "../../db/dawe_db.db"));
 const models = [new City(db), new Country(db), new River(db)];
 const auth = new AuthService(path.join(__dirname, "roles_cfg.yaml"), db);
 
 //PARAMS
 app.use(express.json());
 const port = 3000;
+
+//SEND FRONTEND FILES (with using of staticfiles)
+
+app.use(express.static(
+    path.join(__dirname, "../public")
+));
+
+/*
+
+//example for sending a specific file
+
+app.get('/', (req, res) => {
+    res.sendFile(
+        path.join(__dirname, "../public/index.html")
+    );
+});
+
+*/
 
 //SECURITY
 app.post('/register', (req, res, next)=>{

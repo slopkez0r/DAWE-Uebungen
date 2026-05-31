@@ -1,4 +1,4 @@
-const DbHandler = require("../orm/shandler");
+const DbHandler = require("../../orm/shandler");
 const path = require("path");
 const fs = require("fs");
 const yaml = require("js-yaml");
