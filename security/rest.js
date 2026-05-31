@@ -62,7 +62,6 @@ app.post('/create/:modelname', (req, res, next) => {
 
 
 //READ
-
 app.get('/read/:modelname/:id', (req, res, next) => {
     const modelName = normalize(req.params.modelname);
     
@@ -82,6 +81,27 @@ app.get('/read/:modelname/:id', (req, res, next) => {
     const modelObj = getCorrectModelObject(models, modelName);
     const found = modelObj.readOne(id);
     res.status(200).json(found);
+});
+
+app.get('/getAllEntities/:modelname', (req, res, next) => {
+    const modelName = normalize(req.params.modelname);
+    //authorization
+    const token = req.headers.authorization?.split(" ")[1]; //get payload
+    const decoded = auth.verifyToken(token);
+    const allowed = auth.hasPermission(decoded, modelName, "read");
+
+    if(!allowed){
+        const err = new Error("Forbidden");
+        err.status = 403;
+        next(err); //schicke fehler nach error middleware
+    }
+
+    const id = Number.parseInt(req.params.id);
+
+    const modelObj = getCorrectModelObject(models, modelName);
+    const found = modelObj.readAll(id);
+    res.status(200).json(found);
+
 });
 
 //SEARCH
