@@ -21,93 +21,73 @@ app.use(express.json());
 const port = 3000;
 
 //SECURITY
-app.post('/register', async(req, res)=>{
-            const body = req.body;
-            console.log(body);
-            try{
-                auth.registerUser(body.email, body.password);
-                res.status(200).json({status: "registered", email: body.email, password: body.password});
-            }catch(err){
-                res.status(500).json({status: "declined", email: body.email, password: body.password, error: err});
-            }
-        });
+app.post('/register', (req, res, next)=>{
+    const body = req.body;
+    console.log(body);
+    auth.registerUser(body.email, body.password); // wenn das nicht synchron wäre, müsste man ein wrapper schreiben
+    res.status(200).json({status: "registered", email: body.email, password: body.password});
+});
 
 //LOGIN
-app.post('/login/:role', async(req, res)=>{
+app.post('/login/:role', (req, res, next)=>{
     const role = req.params.role;
     const body = req.body;
+    auth.checkLogin(body.email, body.password);
+    const token = auth.issueToken(role);
+    res.status(200).json({token: token});
 
-    try{
-        auth.checkLogin(body.email, body.password);
-        const token = auth.issueToken(role);
-        res.status(200).json({token: token});
-    }catch(err){
-        res.status(500).json({status: "declined", email: body.email, password: body.password, error: err});
-    }
 });
 
 //RECORD
-app.post('/create/:modelname', async(req, res) => {
-
-
+app.post('/create/:modelname', (req, res, next) => {
     const modelName = normalize(req.params.modelname);
-    console.log(modelName);
 
     //authorization
-
     const token = req.headers.authorization?.split(" ")[1]; //get payload
     const decoded = auth.verifyToken(token);
     const allowed = auth.hasPermission(decoded, modelName, "create");
 
     if(!allowed){
-        return res.status(403).json({error: "forbidden"});
+        const err = new Error("Forbidden");
+        err.status = 403;
+        next(err); //schicke fehler nach error middleware
     }
 
     const body = req.body;
-    console.log(body);
-    try {
-        const modelObj = getCorrectModelObject(models, modelName);
-        console.log(modelObj);
-        modelObj.createOne(body);
-        res.status(200).json(body);
-    }catch(error){
-        console.error(error);
-        res.status(500).json({error: `An error occured while adding the ${modelName}`});
-    }
+    const modelObj = getCorrectModelObject(models, modelName);
+    modelObj.createOne(body);
+
+    res.status(200).json(body);
 });
 
 
 //READ
 
-app.get('/read/:modelname/:id', async(req, res) => {
+app.get('/read/:modelname/:id', (req, res, next) => {
     const modelName = normalize(req.params.modelname);
-     //authorization
-
+    
+    //authorization
     const token = req.headers.authorization?.split(" ")[1]; //get payload
     const decoded = auth.verifyToken(token);
     const allowed = auth.hasPermission(decoded, modelName, "read");
 
     if(!allowed){
-        return res.status(403).json({error: "forbidden"});
+        const err = new Error("Forbidden");
+        err.status = 403;
+        next(err); //schicke fehler nach error middleware
     }
-
 
     const id = Number.parseInt(req.params.id);
 
-    try {
-        const modelObj = getCorrectModelObject(models, modelName);
-        const found = modelObj.readOne(id);
-        res.status(200).json(found);
-    }catch(error){
-        console.error(error);
-        res.status(500).json({error: `An error occured while adding the ${modelName}`});
-    }
+    const modelObj = getCorrectModelObject(models, modelName);
+    const found = modelObj.readOne(id);
+    res.status(200).json(found);
 });
 
 //SEARCH
 
 //json body
-app.post('/search/jsonBody/:modelname', async(req, res) =>{
+app.post('/search/jsonBody/:modelname', (req, res, next) =>{
     const modelName = normalize(req.params.modelname);
      //authorization
 
@@ -132,59 +112,60 @@ app.post('/search/jsonBody/:modelname', async(req, res) =>{
 
 
 //PUT
-app.put('/update/:modelname', async(req, res) => {
+app.put('/update/:modelname', (req, res, next) => {
     const modelName = normalize(req.params.modelname);
 
      //authorization
-
     const token = req.headers.authorization?.split(" ")[1]; //get payload
     const decoded = auth.verifyToken(token);
     const allowed = auth.hasPermission(decoded, modelName, "update");
 
     if(!allowed){
-        return res.status(403).json({error: "forbidden"});
+        const err = new Error("Forbidden");
+        err.status = 403;
+        next(err); //schicke fehler nach error middleware
     }
     
     const body = req.body;
-    try{
-        const modelObj = getCorrectModelObject(models, modelName);
-        modelObj.updateOne(body);
-        const updated = modelObj.readOne(body.id);
-        res.status(200).json(updated);
-    }catch(error){
-        console.error(error);
-        req.status(500).json({error: `There was a problem by updating ${modelName}`});
-    }
+    const modelObj = getCorrectModelObject(models, modelName);
+    modelObj.updateOne(body);
+    const updated = modelObj.readOne(body.id);
+    res.status(200).json(updated);
 });
 
 
 //DELETE
-app.delete('/delete/:modelname/:id', async(req, res) => {
+app.delete('/delete/:modelname/:id', (req, res, next) => {
     const modelName = normalize(req.params.modelname);
 
      //authorization
-
     const token = req.headers.authorization?.split(" ")[1]; //get payload
     const decoded = auth.verifyToken(token);
     const allowed = auth.hasPermission(decoded, modelName, "delete");
 
     if(!allowed){
-        return res.status(403).json({error: "forbidden"});
+        const err = new Error("Forbidden");
+        err.status = 403;
+        next(err); //schicke fehler nach error middleware
     }
 
     const id = Number.parseInt(req.params.id);
 
-    try{
-        const modelObj = getCorrectModelObject(models, modelName);
-        const deletedRecord = modelObj.readOne(id);
-        modelObj.deleteOne(id);
-        res.status(200).json(deletedRecord);
-    }catch(error){
-        console.error(error);
-        req.status(500).json({error: `There was a problem by deleting ${modelName}`});
-    }
+    const modelObj = getCorrectModelObject(models, modelName);
+    const deletedRecord = modelObj.readOne(id);
+    modelObj.deleteOne(id);
+    res.status(200).json(deletedRecord);
 });
 
+
+//ERROR Middleware
+app.use((err, req, res, next) => {
+    console.error(err);
+
+    res.status(500).json({
+        error: err.message
+    });
+});
 
 //HELP FUNCTIONS
 function normalize(string){
