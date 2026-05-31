@@ -18,6 +18,10 @@ class Model{
         return this.db.search(this.constructor.name, search);
     }
 
+    readAll(){
+        return this.db.readAll(this.constructor.name);
+    }
+
     searchMany(search){
         return this.db.searchMany(this.constructor.name, search);
     }

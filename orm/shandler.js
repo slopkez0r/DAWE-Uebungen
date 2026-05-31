@@ -21,6 +21,11 @@ class DbHandler{
         return this.#loadDb(sql);
     }
 
+    readAll(model_name){
+        const sql = `SELECT * FROM ${model_name.toUpperCase()};`;
+        return this.#loadDbMany(sql);
+    }
+
     deleteOne(model_name, id){
         const sql = `DELETE FROM ${model_name.toUpperCase()} WHERE id = ${id};`;
         const deletedobj = this.readOne(model_name, id);
