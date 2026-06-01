@@ -41,10 +41,21 @@ function destroyTable(table){
 }
 
 function createTable(model){
-        // Initialize DataTable
-        var table = new DataTable("#table", {
+    
+    // Add entry button
+    const addButton = document.createElement("button");
+    addButton.classList.add("action");
+    addButton.textContent = "Add new Entry";
+
+    //Action buttons
+    const actions = '<button class = "action">Details</button>'+
+                    '<button class = "action">Edit</button>'+
+                    '<button class = "action">Delete</button>';
+
+    // Initialize DataTable
+    var table = new DataTable("#table", {
         "lengthMenu": [3, 6, 9],
-        "layout": {topStart: ["pageLength"], topEnd: null},
+        "layout": {topStart: ["pageLength", addButton], topEnd: null},
         "ajax": {
             "url": `getAllEntities/${model}`,
             "method": "GET",
@@ -57,10 +68,17 @@ function createTable(model){
             $('#errorMessage').show();
             }
         },
-        "columns": modelDependendColumns[model]
+        "columns": [
+            ...modelDependendColumns[model],
+            {title: "Actions",
+                data: null,
+                defaultContent: actions,
+                orderable: false,
+                searchable: false
+            }]
         });
-        return table;
-        //setInterval(table.ajax.reload, 10000)
+    return table;
+    //setInterval(table.ajax.reload, 10000)
 };
 
 

@@ -71,17 +71,24 @@ nav{
     width: 100%;
 }
 
-.button{
-    border-radius: 6px;
-    border: 1px solid var(--card-border);
-}
-
-.button add{
-    background-color: green;
-}
-
-.button {
+.action-button {
     display: flex;
     align-items: center;
     gap: 8px;
+}
+
+.action{
+    color: var(--accent);
+    background: var(--card-bg);
+    border:1px solid var(--card-border);
+    border-radius: 6px;
+    min-height: 35px;
+    padding: 0px 6px;
+    margin-right: 6px;
+}
+
+
+.action:hover{
+    color: var(--text-primary);
+    background-color: #8B7FFF99;
 }
