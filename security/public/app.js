@@ -16,10 +16,13 @@ const modelDependendColumns = {
 let currentModel = "city";
 var currentTable;
 
-document.addEventListener("DOMContentLoaded", () => {
-    currentTable = createTable(currentModel);
+//LISTEN EVENTS
 
-    document.querySelectorAll(".model-tab").forEach((button) => {
+document.addEventListener("DOMContentLoaded", () => {
+    
+    //table init
+    currentTable = createTable(currentModel);
+    document.querySelectorAll(".model-tab").forEach((button) => { //wähle alle knöpfe
         button.addEventListener("click", () => {
             currentModel = button.dataset.model;
 
@@ -33,7 +36,98 @@ document.addEventListener("DOMContentLoaded", () => {
             button.classList.add("active");
         });
     });
+
+    //actions handling
+    document.querySelector("#table").addEventListener("click", (event) => {
+    const button = event.target.closest(".action");
+    if (!button) return;
+
+    const action = button.dataset.action;
+    //action listener
+    if (action === "details" || action === "edit" || action === "delete") {
+        const rowData = currentTable.row(button.closest("tr")).data(); //tr - table row (suche nach nächstliegeniden tr ausgehend vom action button)
+
+        if (action === "details") {
+            openRecordModal(rowData, "details", currentModel);
+        }
+
+        if (action === "edit") {
+            openRecordModal(rowData, "edit", currentModel);
+        }
+
+        if (action === "delete") {
+            openDeleteModal(rowData);
+        }
+    }
+    });
 });
+
+//HELP FUNCTIONS
+
+function openRecordModal(rowData, type, model){
+
+    const cancelButton = document.getElementById("closeModal");
+
+    cancelButton.addEventListener("click", () => {
+        document.getElementById("recordModal").close();
+    });
+
+
+    const currDiv = document.getElementById("formFields");
+    
+    //schelcht implementiert
+    switch(type){
+        case "details":{
+            currDiv.innerHTML = "";
+            var forms = [];
+            for (const [column, value] of Object.entries(rowData)) {
+                const newDiv = document.createElement("div");
+                newDiv.innerHTML = `
+                <div>
+                    <label>${column}</label>
+                    <input value="${value}" readonly>
+                </div>
+                `
+                currDiv.appendChild(newDiv);
+            }
+            document.getElementById("recordModal").showModal();
+            break;
+        }
+        case "edit": {
+            currDiv.innerHTML = "";
+            var forms = [];
+            for (const [column, value] of Object.entries(rowData)) {
+                const newDiv = document.createElement("div");
+                newDiv.innerHTML = `
+                <div>
+                    <label>${column}</label>
+                    <input value="${value}">
+                </div>
+                `
+                currDiv.appendChild(newDiv);
+            }
+            document.getElementById("recordModal").showModal();
+            break;
+        }
+        case "create":{
+            currDiv.innerHTML = "";
+            var forms = [];
+            for (const field of modelDependendColumns[model]) {
+                const newDiv = document.createElement("div");
+                newDiv.innerHTML = `
+                <div>
+                    <label>${column}</label>
+                    <input value="enter valid ${column}">
+                </div>
+                `
+                currDiv.appendChild(newDiv);
+            }
+            document.getElementById("recordModal").showModal();
+            break;
+        }
+        default: console.log("such type is not avaliable");
+    }    
+}
 
 function destroyTable(table){
     table.destroy();
@@ -48,13 +142,13 @@ function createTable(model){
     addButton.textContent = "Add new Entry";
 
     //Action buttons
-    const actions = '<button class = "action">Details</button>'+
-                    '<button class = "action">Edit</button>'+
-                    '<button class = "action">Delete</button>';
+    const actions = '<button class = "action" data-action = "details">Details</button>'+
+                    '<button class = "action" data-action = "edit">Edit</button>'+
+                    '<button class = "action" data-action = "delete">Delete</button>';
 
     // Initialize DataTable
     var table = new DataTable("#table", {
-        "lengthMenu": [3, 6, 9],
+        "lengthMenu": [6, 9, 12],
         "layout": {topStart: ["pageLength", addButton], topEnd: null},
         "ajax": {
             "url": `getAllEntities/${model}`,

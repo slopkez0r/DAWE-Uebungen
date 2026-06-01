@@ -10,7 +10,7 @@
     </head>
     <body>
         <header>
-            <h1>GeoData-Dashboard</h1>
+            <h1>Data-Dashboard</h1>
         </header>
 
         <nav>
@@ -19,10 +19,40 @@
                 <button class = "model-tab" data-model = "river">River</button>
         </nav>
         
+        <!--scripts-->
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="https://cdn.datatables.net/2.2.1/js/dataTables.min.js"></script>
         <script src = "app.js"></script>
         
+        <!--form-->
+        <dialog id = "recordModal">
+            <form id = "recordForm">
+                <div id = "formFields"></div>
+                <div class = "modal-actions">
+                    <button type = "submit">Save</button>
+                    <button type = "button" id = closeModal>Cancel</button>
+                </div>
+            </form>
+        </dialog>
+
+        <!--delete warining-->
+        <dialog id="deleteModal">
+
+            <h2>Delete Record</h2>
+
+            <p id="deleteMessage"></p>
+
+            <button id="confirmDelete">
+                Delete
+            </button>
+
+            <button id="cancelDelete">
+                Cancel
+            </button>
+
+        </dialog>
+                
+        <!--content card-->
         <content-card>
             <table id="table"></table>
         </content-card>
