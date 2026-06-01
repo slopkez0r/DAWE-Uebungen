@@ -101,6 +101,7 @@ app.get('/read/:modelname/:id', (req, res, next) => {
     res.status(200).json(found);
 });
 
+//für tabelle relevant
 app.get('/getAllEntities/:modelname', (req, res, next) => {
     const modelName = normalize(req.params.modelname);
     //authorization

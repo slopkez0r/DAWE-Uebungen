@@ -26,29 +26,27 @@
         
         <!--form-->
         <dialog id = "recordModal">
-            <form id = "recordForm">
+            <form id = "recordForm" class = "form">
                 <div id = "formFields"></div>
                 <div class = "modal-actions">
-                    <button type = "submit">Save</button>
-                    <button type = "button" id = closeModal>Cancel</button>
+                    <button type = "submit" id = "submit" class = "action">Save</button>
+                    <button type = "button" id = "closeModal" class = "action">Cancel</button>
                 </div>
             </form>
         </dialog>
 
         <!--delete warining-->
         <dialog id="deleteModal">
-
-            <h2>Are you sure?</h2>
-
-            <p id="deleteMessage"></p>
-
-            <button id="confirmDelete">
-                Delete
-            </button>
-
-            <button id="cancelDelete">
-                Cancel
-            </button>
+            <form class = "form">
+                <h2>Are you sure?</h2>
+                <p id="deleteMessage"></p>
+                <button type = "button" id="confirmDelete">
+                    Delete
+                </button>
+                <button type = "button" id="cancelDelete">
+                    Cancel
+                </button>
+            </form>
 
         </dialog>
                 

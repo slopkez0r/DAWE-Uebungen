@@ -94,3 +94,59 @@ nav{
 }
 
 /*TODO: STYLE FOR POPUPUS*/
+
+@keyframes opacityAnim{
+    from {background: transparent;}
+    to {background: var(--card-bg);}
+}
+
+dialog {
+    border: none;
+    padding: 0;
+    background: transparent;
+}
+
+dialog[open] {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+dialog::backdrop {
+    background: transparent;
+    backdrop-filter: blur(8px);
+    animation-name: opacityAnim;
+    animation-duration: 1s;
+    animation-fill-mode: forwards;
+}
+
+@keyframes formAppearAnim{
+
+    from {
+        transform: scale(0.5);
+        background-color: transparent;
+        transition: transform 1s ease-out;
+    }
+
+    to {
+        transform: scale(1);
+        background-color: var(--card-bg);
+        transition: transform 1s ease-out;
+    }
+}
+
+
+/*LAYOUT INSIDE FORM FIX*/
+.form{
+    display: flex;
+    padding: 14px 16px;
+    border: 1px solid var(--card-border);
+    border-radius: 6px;
+    background-color: var(--card-bg);
+    color: var(--text-secondary);
+    animation-name: formAppearAnim;
+    animation-duration: 1s;
+    animation-fill-mode: forwards;
+}
+
+

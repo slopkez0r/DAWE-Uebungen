@@ -1,6 +1,7 @@
 
 const BEARER = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJhbGxvd3MiOlt7InJlc291cmNlcyI6WyJDaXR5IiwiQ291bnRyeSIsIlJpdmVyIl0sInBlcm1pc3Npb25zIjoiKiJ9XSwiaWF0IjoxNzgwMjQzOTY1fQ.BP1dJ7mnJlIqZvkzHlQkgURq4qFUpPLwLqB102YHOsk"; //admin
 
+//TODO: refactor, add auth
 
 const modelDependendColumns = {
     city : [{ "title": "Name", "data": "name" },
@@ -44,11 +45,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const action = button.dataset.action;
 
+
     //action listener
     if (action === "details" || action === "edit" || action === "delete") {
         const rowData = currentTable.row(button.closest("tr")).data(); //tr - table row (suche nach nächstliegeniden tr ausgehend vom action button)
 
         if (action === "details") {
+            document.getElementById("submit").style.display = "none";
             openRecordModal(rowData, "details", currentModel);
         }
 
@@ -67,10 +70,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     cancelButton.addEventListener("click", () => {
         document.getElementById("recordModal").close();
+        document.getElementById("submit").style.display = "inline-block";
     });
 
     //form submission
-    const form = document.gerElementById("recordForm");
+    const form = document.getElementById("recordForm");
     form.addEventListener("submit", async(event) => {
         event.preventDefault(); //to avoid page reload
         //TODO: call fetch functions with methods post put delete
@@ -86,7 +90,6 @@ function openRecordModal(rowData, type, model){
     switch(type){
         case "details":{
             currDiv.innerHTML = "";
-            var forms = [];
             for (const [column, value] of Object.entries(rowData)) {
                 const newDiv = document.createElement("div");
                 newDiv.innerHTML = `
@@ -102,7 +105,6 @@ function openRecordModal(rowData, type, model){
         }
         case "edit": {
             currDiv.innerHTML = "";
-            var forms = [];
             for (const [column, value] of Object.entries(rowData)) {
                 const newDiv = document.createElement("div");
                 newDiv.innerHTML = `
@@ -118,7 +120,6 @@ function openRecordModal(rowData, type, model){
         }
         case "create":{
             currDiv.innerHTML = "";
-            var forms = [];
             for (const field of modelDependendColumns[model]) {
                 const newDiv = document.createElement("div");
                 newDiv.innerHTML = `
@@ -147,7 +148,7 @@ function openDeleteModal(){
     });
 }
 
-function destroyTable(table){
+function destroyTable(table){ //brauche nicht mehr, da die methode reload verfügbar ist
     table.destroy();
     document.querySelector("#table").innerHTML = "";
 }
@@ -194,5 +195,5 @@ function createTable(model){
             }]
         });
     return table;
-    //setInterval(table.ajax.reload, 10000)
+    setInterval(table.ajax.reload, 10000)
 };
