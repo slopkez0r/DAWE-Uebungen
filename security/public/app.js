@@ -19,7 +19,7 @@ var currentTable;
 //LISTEN EVENTS
 
 document.addEventListener("DOMContentLoaded", () => {
-    
+
     //table init
     currentTable = createTable(currentModel);
     document.querySelectorAll(".model-tab").forEach((button) => { //wähle alle knöpfe
@@ -43,6 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!button) return;
 
     const action = button.dataset.action;
+
     //action listener
     if (action === "details" || action === "edit" || action === "delete") {
         const rowData = currentTable.row(button.closest("tr")).data(); //tr - table row (suche nach nächstliegeniden tr ausgehend vom action button)
@@ -60,19 +61,25 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
     });
-});
 
-//HELP FUNCTIONS
-
-function openRecordModal(rowData, type, model){
-
+    //cancel button listener
     const cancelButton = document.getElementById("closeModal");
 
     cancelButton.addEventListener("click", () => {
         document.getElementById("recordModal").close();
     });
 
+    //form submission
+    const form = document.gerElementById("recordForm");
+    form.addEventListener("submit", async(event) => {
+        event.preventDefault(); //to avoid page reload
+        //TODO: call fetch functions with methods post put delete
+    });
+});
 
+//HELP FUNCTIONS
+
+function openRecordModal(rowData, type, model){
     const currDiv = document.getElementById("formFields");
     
     //schelcht implementiert
@@ -116,8 +123,8 @@ function openRecordModal(rowData, type, model){
                 const newDiv = document.createElement("div");
                 newDiv.innerHTML = `
                 <div>
-                    <label>${column}</label>
-                    <input value="enter valid ${column}">
+                    <label>${field.title}</label>
+                    <input placeholder="enter valid ${field.data}">
                 </div>
                 `
                 currDiv.appendChild(newDiv);
@@ -127,6 +134,17 @@ function openRecordModal(rowData, type, model){
         }
         default: console.log("such type is not avaliable");
     }    
+}
+
+function openDeleteModal(){
+    const currDiv = document.getElementById("deleteModal");
+    currDiv.showModal();
+
+    const cancelButton = document.getElementById("cancelDelete");
+
+    cancelButton.addEventListener("click", () => {
+        currDiv.close();
+    });
 }
 
 function destroyTable(table){
@@ -140,6 +158,10 @@ function createTable(model){
     const addButton = document.createElement("button");
     addButton.classList.add("action");
     addButton.textContent = "Add new Entry";
+
+    addButton.addEventListener("click", ()=>{
+        openRecordModal(null, "create", model)
+    });
 
     //Action buttons
     const actions = '<button class = "action" data-action = "details">Details</button>'+
@@ -174,6 +196,3 @@ function createTable(model){
     return table;
     //setInterval(table.ajax.reload, 10000)
 };
-
-
-//TODO: action buttons, refresh & add button, implement popups with CRUD functions except search
