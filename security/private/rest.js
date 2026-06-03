@@ -68,7 +68,7 @@ app.post('/create/:modelname', (req, res, next) => {
     if(!allowed){
         const err = new Error("Forbidden");
         err.status = 403;
-        next(err); //schicke fehler nach error middleware
+        return next(err); //schicke fehler nach error middleware
     }
 
     const body = req.body;
@@ -91,7 +91,7 @@ app.get('/read/:modelname/:id', (req, res, next) => {
     if(!allowed){
         const err = new Error("Forbidden");
         err.status = 403;
-        next(err); //schicke fehler nach error middleware
+        return next(err); //schicke fehler nach error middleware
     }
 
     const id = Number.parseInt(req.params.id);
@@ -112,13 +112,11 @@ app.get('/getAllEntities/:modelname', (req, res, next) => {
     if(!allowed){
         const err = new Error("Forbidden");
         err.status = 403;
-        next(err); //schicke fehler nach error middleware
+        return next(err); //schicke fehler nach error middleware
     }
 
-    const id = Number.parseInt(req.params.id);
-
     const modelObj = getCorrectModelObject(models, modelName);
-    const found = modelObj.readAll(id);
+    const found = modelObj.readAll();
     res.status(200).json(found);
 
 });
@@ -166,6 +164,7 @@ app.put('/update/:modelname', (req, res, next) => {
     }
     
     const body = req.body;
+    console.log(`Body from app: ${body}`);
     const modelObj = getCorrectModelObject(models, modelName);
     modelObj.updateOne(body);
     const updated = modelObj.readOne(body.id);

@@ -49,7 +49,7 @@ class City extends Model{
             name: body.name,
             coordinates: body.coordinates,
             population: body.population,
-            country_name: body.country_name
+            country_name: normalize(body.country_name)
         }
 
         try {
@@ -63,7 +63,7 @@ class City extends Model{
             return this.db.search("City", {name: record.name, operator: "=", by: "name", type: "desc"});
 
         }catch(err){
-            console.log(err.message);
+            throw new Error(err);
         }
     }
 
@@ -77,7 +77,7 @@ class City extends Model{
                 throw new Error("country not found");
             }
             const city = this.db.search("City",
-                            {coordinates: record.coordinates, operator: "=", by: "name", type: "desc"});
+                            {coordinates: record.coordinates, operator: "=", by: "coordinates", type: "desc"});
 
             if(city){
                 throw new Error("city already exists");
@@ -152,7 +152,7 @@ class City extends Model{
 class Country extends Model {
     createOne(body){
         const record = {
-            name: body.name,
+            name: normalize(body.name),
             is_democratic: body.is_democratic,
             population: body.population
         }
@@ -305,7 +305,7 @@ class Country extends Model {
 class River extends Model {
     createOne(body){
         const record = {
-            name: body.name,
+            name: normalize(body.name),
             length: body.length
         }
 
@@ -379,6 +379,14 @@ class River extends Model {
         
         return countries;
     }
+}
+
+function normalize(string){
+    
+    console.log(string);
+    const lowercased = string.toLowerCase();
+    console.log(lowercased);
+    return lowercased.charAt(0).toUpperCase() + lowercased.slice(1);
 }
 
 module.exports = [Model, City, Country, River];
