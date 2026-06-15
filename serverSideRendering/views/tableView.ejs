@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>GeoDataDashboard</title>
+        <link href = "stylesheet.css" rel = "stylesheet">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+    </head>
+    <body>
+        <header>
+            <h1>Cities</h1>
+        </header>
+        <div class = "content-card">
+            <a href="/city/create">Add city</a>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Population</th>
+                        <th>ID</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% for (const city of cities) { %>
+                        <tr>
+                            <td><%= city.name %></td>
+                            <td><%= city.population %></td>
+                            <td><%= city.id %></td>
+                            <td>
+                                <a href="/city/<%= city.id %>">Details</a>
+                                <a href="/city/<%= city.id %>/edit">Edit</a>
+                                <a href="/city/<%= city.id %>/delete">Delete</a>
+                            </td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </body>
+</html>

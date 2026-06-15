@@ -1,0 +1,152 @@
+:root {
+    --background: #0A0E1C;
+    --card-bg: rgba(255, 255, 255, 0.05);
+    --card-border: rgba(255, 255, 255, 0.1);
+    --text-primary: #F5F5F5;
+    --text-secondary: #8A8B8C;
+    --accent: #8B7FFF;
+    --accent-hover: #A89EFF;
+}
+
+body{
+    font-family: "Manpore" sans-serif;
+    color: var(--text-primary);
+    background-image: linear-gradient(to bottom, #000000, #090E1D, #0A0E1C);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    /*height for background*/
+    min-height: 100vh;
+}
+
+.content-card {
+    display: flex;
+    background: var(--card-bg);
+    max-width: 1200px;
+    border: 1px solid var(--card-border);
+    border-radius: 6px;
+    padding: 24px;
+    backdrop-filter: blur(15px);
+    margin: 40px auto;
+}
+
+header{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+nav{
+    color: var(--text-secondary);
+    display: flex;
+    gap: 12px;
+    margin: 20px auto;
+
+    /*background-color: red;*/
+}
+
+.model-tab {
+    color: var(--text-secondary);
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 6px;
+    padding: 14px 16px;
+    font-family: "Manrope", sans-serif;
+    cursor: pointer;
+    flex: 1;
+}
+
+.model-tab:hover{
+    color: var(--text-primary);
+    background-color: #8B7FFF99;
+}
+
+.model-tab.active{
+    color: var(--text-primary);
+    background-color: #8B7FFF99;
+}
+
+#table_wrapper {
+    width: 100%;
+}
+
+.action-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.action{
+    color: var(--accent);
+    background: var(--card-bg);
+    border:1px solid var(--card-border);
+    border-radius: 6px;
+    min-height: 35px;
+    padding: 0px 6px;
+    margin-right: 6px;
+}
+
+
+.action:hover{
+    color: var(--text-primary);
+    background-color: #8B7FFF99;
+}
+
+/*TODO: STYLE FOR POPUPUS*/
+
+@keyframes opacityAnim{
+    from {background: transparent;}
+    to {background: var(--card-bg);}
+}
+
+dialog {
+    border: none;
+    padding: 0;
+    background: transparent;
+}
+
+dialog[open] {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+dialog::backdrop {
+    background: transparent;
+    backdrop-filter: blur(8px);
+    animation-name: opacityAnim;
+    animation-duration: 1s;
+    animation-fill-mode: forwards;
+}
+
+@keyframes formAppearAnim{
+
+    from {
+        transform: scale(0.5);
+        background-color: transparent;
+        transition: transform 1s ease-out;
+    }
+
+    to {
+        transform: scale(1);
+        background-color: var(--card-bg);
+        transition: transform 1s ease-out;
+    }
+}
+
+
+/*LAYOUT INSIDE FORM FIX*/
+.form{
+    display: flex;
+    padding: 14px 16px;
+    border: 1px solid var(--card-border);
+    border-radius: 6px;
+    background-color: var(--card-bg);
+    color: var(--text-secondary);
+    animation-name: formAppearAnim;
+    animation-duration: 1s;
+    animation-fill-mode: forwards;
+}
+
+

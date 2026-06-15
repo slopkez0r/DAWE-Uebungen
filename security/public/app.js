@@ -6,7 +6,8 @@ const BEARER = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJhbGx
 const modelDependendColumns = {
     city : [{ "title": "Name", "data": "name" },
         { "title": "Population", "data": "population" },
-        { "title": "Coordinates", "data": "coordinates"}],
+        { "title": "Coordinates", "data": "coordinates"},
+        {"title": "Country", "data": "country_name"}],
 
     country: [{ "title": "Name", "data": "name" },
         { "title": "Population", "data": "population" }],
@@ -77,13 +78,83 @@ document.addEventListener("DOMContentLoaded", () => {
     const form = document.getElementById("recordForm");
     form.addEventListener("submit", async(event) => {
         event.preventDefault(); //to avoid page reload
-        //TODO: call fetch functions with methods post put delete
+        
+        //GET OBJECT FROM FORM
+        const formData = new FormData(form);
+        const body = Object.fromEntries(formData.entries());
+        console.log(body);
+
+        //use different handling functions
+        switch(form.dataset.type){
+            case "create": 
+            try {
+                await createEntry(currentModel, body, BEARER);
+                }catch(error){
+                    console.error(error);
+                }
+                break;
+            case "edit": 
+            try {
+                await updateEntry(currentModel, body, BEARER);
+            }catch(error){
+                console.error(error);
+            }
+            break;
+        }
+        document.getElementById("recordModal").close();
+        currentTable.ajax.reload();
+
     });
 });
 
 //HELP FUNCTIONS
 
+async function updateEntry(modelName, body, bearer){
+
+    //TODO: error handling
+    const response = await fetch(`http://localhost:3000/update/${modelName}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization" : `Bearer ${bearer}`
+        },
+        body: JSON.stringify(body)
+    });
+
+    if(!response.ok){
+        throw new Error(`HTTP Error: ${response.status}`);
+    }
+}
+
+async function createEntry(modelName, body, bearer){
+    const response = await fetch(`http://localhost:3000/create/${modelName}`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization" : `Bearer ${bearer}`
+        },
+        body: JSON.stringify(body)
+    });
+    if(!response.ok){
+        throw new Error(`HTTP Error: ${response.status}`);
+    }
+}
+
+async function deleteEntry(modelName, id, bearer){
+    const response = await fetch(`http://localhost:3000/delete/${modelName}/${id}`, {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization" : `Bearer ${bearer}`
+        }
+    });
+    if(!response.ok){
+        throw new Error(`HTTP Error: ${response.status}`);
+    }
+}
+
 function openRecordModal(rowData, type, model){
+    const form = document.getElementById("recordForm");
     const currDiv = document.getElementById("formFields");
     
     //schelcht implementiert
@@ -95,7 +166,7 @@ function openRecordModal(rowData, type, model){
                 newDiv.innerHTML = `
                 <div>
                     <label>${column}</label>
-                    <input value="${value}" readonly>
+                    <input name="${column}" value="${value}" readonly>
                 </div>
                 `
                 currDiv.appendChild(newDiv);
@@ -104,13 +175,14 @@ function openRecordModal(rowData, type, model){
             break;
         }
         case "edit": {
+            form.dataset.type = "edit";
             currDiv.innerHTML = "";
             for (const [column, value] of Object.entries(rowData)) {
                 const newDiv = document.createElement("div");
                 newDiv.innerHTML = `
                 <div>
                     <label>${column}</label>
-                    <input value="${value}">
+                    <input name="${column}" value="${value}">
                 </div>
                 `
                 currDiv.appendChild(newDiv);
@@ -119,13 +191,14 @@ function openRecordModal(rowData, type, model){
             break;
         }
         case "create":{
+            form.dataset.type = "create";
             currDiv.innerHTML = "";
             for (const field of modelDependendColumns[model]) {
                 const newDiv = document.createElement("div");
                 newDiv.innerHTML = `
                 <div>
                     <label>${field.title}</label>
-                    <input placeholder="enter valid ${field.data}">
+                    <input name="${field.data}" placeholder="enter valid ${field.data}">
                 </div>
                 `
                 currDiv.appendChild(newDiv);
@@ -181,7 +254,7 @@ function createTable(model){
             },
             "dataSrc": "", //as i have only simple array
             "error": function(xhr, error, thrown) {
-            $('#example_wrapper').hide();  // #example_wrapper is the wrapper created by DataTable
+            $('#table_wrapper').hide();  // #example_wrapper is the wrapper created by DataTable
             $('#errorMessage').show();
             }
         },
