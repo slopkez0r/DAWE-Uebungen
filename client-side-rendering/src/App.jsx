@@ -6,14 +6,22 @@ const App = () => {
   const [entries, setEntries] = useState([]);
   const [editingEntry, setEditingEntry] = useState(null);
   const [error, setError] = useState('');
+  const [currentModel, setCurrentModel] = useState("country"); //variable + function which changes this variable
 
+  const columns = {
+    country: ["name", "is_democratic", "population"],
+    city: ["name", "coordinates", "population"],
+    river: ["name", "length"]
+  };
+  
   useEffect(() => {
-    fetchEntries();
-  }, []);
+    fetchEntries(currentModel); //was zu machen
+  }, [currentModel]); //welche variable muss beobachtet werden, wird aufgerufen wenn sich currentModel ändert 
 
-  const fetchEntries = async () => {
+  //GET
+  const fetchEntries = async (currentModel) => {
     try {
-      const response = await fetch(`/api/getAllEntities/country`); 
+      const response = await fetch(`/api/getAllEntities/${currentModel}`); 
       const data = await response.json();
       setEntries(data);
     } catch (error) {
@@ -21,20 +29,43 @@ const App = () => {
     }
   };
 
+  //PUT
   const handleSave = async (entry) => {
+    console.log(entry);
     setError('');
+
+    //cast text to boolean for country model (bad)
+    const parsedEntry = {...entry};
+    if("is_democratic" in parsedEntry) {
+      parsedEntry.is_democratic = parsedEntry.is_democratic === "1";
+    }
+    console.log(typeof parsedEntry.is_democratic);
+
     try {
       if (editingEntry) {
-        await axios.put(`http://localhost:5000/api/countries/${entry.id}`, entry);
+        console.log(currentModel);
+        const response = await fetch(`/api/update/${currentModel}`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(parsedEntry)  
+                });
       } 
       else {
-        if (!entry.id || !entry.name) {
+        if (!entry.name) {
           setError('ID and name are required');
           return;
         }
-        await axios.post('http://localhost:5000/api/countries', entry);
+        const response = await fetch(`/api/create/${currentModel}`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(parsedEntry)
+                });
       }
-      fetchEntries(); // Refresh country list
+      fetchEntries(currentModel); // Refresh country list
     } catch (error) {
       setError('Error saving country. ID already exists.');
     }
@@ -47,7 +78,12 @@ const App = () => {
     }
 
     try {
-      await axios.delete(`http://localhost:5000/api/countries/${id}`);
+      const response = await fetch(`api/delete/${currentModel}/${id}`, {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json"
+                    } 
+                });
       setEntries(entries.filter(entry => entry.id !== id));
     } catch (error) {
       console.error('Error deleting entry:', error);
@@ -66,7 +102,12 @@ const App = () => {
 
   return (
     <Router>
-      <View // defining data for child views
+      <View 
+      // view bekommt alle props
+        currentModel = {currentModel}
+        setCurrentModel = {setCurrentModel}
+        columns = {columns}
+
         entries={entries}
         editingEntry={editingEntry}
         setEditingEntry={setEditingEntry}

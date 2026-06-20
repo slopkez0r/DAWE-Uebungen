@@ -203,7 +203,7 @@ class Country extends Model {
         }
         
         if (record.is_democratic !== undefined) {
-            if (typeof record.is_democratic !== Boolean) {
+            if (typeof record.is_democratic !== "boolean") {
                 throw new Error("type exception: is_democratic must be boolean");
             }
         }

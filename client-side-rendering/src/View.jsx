@@ -1,9 +1,10 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
-import CountryTable from './components/CountryTable';
+import ModelTable from './components/CountryTable';
 import CreateUpdate from './components/CreateUpdate';
+import NavBar from './components/NavBar';
 
-const View = ({ entries, editingEntry, setEditingEntry, handleSave, handleDelete, error }) => {
+const View = ({columns, currentModel, setCurrentModel, entries, editingEntry, setEditingEntry, handleSave, handleDelete, error }) => {
   const navigate = useNavigate();
 
   const save = async (entry) => {
@@ -13,31 +14,48 @@ const View = ({ entries, editingEntry, setEditingEntry, handleSave, handleDelete
 
   const handleEdit = (entry) => {
     setEditingEntry(entry);
-    navigate('/edit');
+    navigate(`/edit/${currentModel}`);
   };
 
-  const handleCreate = () => {
+  const handleCreate = (model) => {
     setEditingEntry(null);
-    navigate('/create');
+    navigate(`/create/${currentModel}`);
   };
+
+  const changeModel = (model) => {
+    setCurrentModel(model);
+    setEditingEntry(null);
+    navigate("/");
+  }
 
   return (
     <div>
-      <h2>My Vite React App</h2>
+      <h2>Data Dashboard</h2>
+      <NavBar 
+          columns = {columns}
+          currentModel = {currentModel}
+          changeModel ={changeModel}
+      />
       <Routes>
         <Route path="/" element={
-          <button onClick={handleCreate}>Create new city</button>
+          <button onClick={() => handleCreate(currentModel)}>Create new Entry</button>
         } />
-        <Route path="/create" element={
+        <Route path="/create/:model" element={
           <CreateUpdate
+            currentModel={currentModel}
+            columns = {columns}
+            onCancel = {() => navigate("/")}
             onSave={save}
             initialData={null}
             isEditing={false}
             error={error}
           />
         } />
-        <Route path="/edit" element={
+        <Route path="/edit/:model" element={
           <CreateUpdate
+            currentModel={currentModel}
+            columns = {columns}
+            onCancel = {() => navigate("/")}
             onSave={save}
             initialData={editingEntry}
             isEditing={Boolean(editingEntry)}
@@ -45,7 +63,12 @@ const View = ({ entries, editingEntry, setEditingEntry, handleSave, handleDelete
           />
         } />
       </Routes>
-      <CountryTable data={entries} onEdit={handleEdit} onDelete={handleDelete} />
+      <ModelTable 
+        currentModel = {currentModel}
+        columns = {columns}
+        data={entries}
+        onEdit={handleEdit}
+        onDelete={handleDelete} />
     </div>
   );
 };
