@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Dashboard</title>
+    </head>
+    <body>
+        <header>Dashboard</header>
+        
+        <!--navigation-->
+        <nav>
+            <button
+                hx-get="/dashboard/country"
+                hx-target="body"> <%#apply changes to%>
+                Countries
+            </button>
+
+            <button
+                hx-get="/dashboard/city"
+                hx-target="body">
+                Cities
+            </button>
+
+            <button
+                hx-get="/dashboard/river"
+                hx-target="body">
+                Rivers
+            </button>
+        </nav>
+
+        <!--form container-->
+        <div id = "form container"> 
+            <% if(entity){%>
+                <%- include("parts/form", {  <%#render raw html %>
+                    entity: entity,
+                    columns: columns,
+                    model: model
+                }) %
+            <%}%>
+        </div>
+        <!--table container-->
+        <div id="table-container">
+            <%- include("parts/table", {  <%#render raw html %>
+                entities: entities,
+                columns: columns,
+                model: model
+            })%>
+        </div>
+    </body>
+</html>
