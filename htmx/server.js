@@ -16,9 +16,9 @@ const port = 3000;
 
 //FOR RENDERING
 const columns = {
-    country: ["name", "is_democratic", "population"],
-    city: ["name", "coordinates", "population"],
-    river: ["name", "length"]
+    country: ["id", "name", "is_democratic", "population"],
+    city: ["id", "name", "coordinates", "population"],
+    river: ["id", "name", "length"]
 };
 
 app.set("view engine", "ejs");
@@ -56,6 +56,25 @@ app.get('/api/create-form/:modelname', (req, res, next) => {
         readonly: false,
         method: "post",
         actionUrl: `/api/create/${model}`
+    });
+});
+
+app.get('/api/details-form/:modelname/:id', (req, res, next) => {
+    const modelName = normalize(req.params.modelname);
+    const modelObj = getCorrectModelObject(models, modelName);
+    const cols = columns[modelName];
+    const id = req.params.id;
+    console.log(id);
+
+    const content = modelObj.readOne(id);
+
+    res.render("parts/form", {
+        entity: content,
+        columns: cols,
+        model: modelName,
+        readonly: true,
+        method: "put",
+        actionUrl: ""
     });
 });
 
