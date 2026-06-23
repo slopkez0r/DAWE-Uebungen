@@ -1,13 +1,13 @@
 //IMPORT
-const [Model, City, Country, River] = require("../../orm/orm");
-const DbHandler = require("../../orm/shandler");
+const [Model, City, Country, River] = require("../orm/orm");
+const DbHandler = require("../orm/shandler");
 const path = require("path");
 const express = require("express");
 
 
 //INSTANCES
 var app = express();
-const db = new DbHandler(path.join(__dirname, "../../db/dawe_db.db"));
+const db = new DbHandler(path.join(__dirname, "../db/dawe_db.db"));
 const models = [new City(db), new Country(db), new River(db)];
 
 //PARAMS
@@ -21,8 +21,48 @@ const columns = {
     river: ["name", "length"]
 };
 
+app.set("view engine", "ejs");
+app.use(express.static(path.join(__dirname, "views")));
+
+//HTMX endpoints
+app.get("/", (req, res) => {
+    res.redirect("/dashboard/country");
+});
+
+
+app.get('/dashboard/:modelname', (req, res, next) => {
+    const model = req.params.modelname;
+    const modelName = normalize(req.params.modelname);
+    const modelObj = getCorrectModelObject(models, modelName);
+    const entities = modelObj.readAll();
+    const cols = columns[model];
+    res.render( "index", {
+        model,
+        cols,
+        entities,
+        entity: null
+    });
+});
+
+app.get('/api/create-form/:modelname', (req, res, next) => {
+    const model = req.params.modelname;
+    const modelName = normalize(req.params.modelname);
+    const modelObj = getCorrectModelObject(models, modelName);
+    const cols = columns[model];
+    res.render("parts/form", {
+        entity: {},
+        columns: cols,
+        model: model,
+        readonly: false,
+        method: "post",
+        actionUrl: `/api/create/${model}`
+    });
+});
+
+
+
 //RECORD
-app.post('/create/:modelname', (req, res, next) => {
+app.post('/api/create/:modelname', (req, res, next) => {
     const modelName = normalize(req.params.modelname);
     const body = req.body;
     const modelObj = getCorrectModelObject(models, modelName);
@@ -33,7 +73,7 @@ app.post('/create/:modelname', (req, res, next) => {
 
 
 //READ
-app.get('/read/:modelname/:id', (req, res, next) => {
+app.get('/api/read/:modelname/:id', (req, res, next) => {
     const modelName = normalize(req.params.modelname);
     const id = Number.parseInt(req.params.id);
 
@@ -69,7 +109,7 @@ app.post('/search/jsonBody/:modelname', (req, res, next) =>{
 
 
 //PUT
-app.put('/update/:modelname', (req, res, next) => {
+app.put('/api/update/:modelname', (req, res, next) => {
     const modelName = normalize(req.params.modelname);
     
     const body = req.body;
@@ -82,7 +122,7 @@ app.put('/update/:modelname', (req, res, next) => {
 
 
 //DELETE
-app.delete('/delete/:modelname/:id', (req, res, next) => {
+app.delete('/api/delete/:modelname/:id', (req, res, next) => {
     const modelName = normalize(req.params.modelname);
 
     const id = Number.parseInt(req.params.id);
@@ -121,9 +161,6 @@ function getCorrectModelObject(modelsArr, modelName){
     }
     throw new Error("Model not found");
 }
-
-
-//IMPLEMENT ENDPOINT DASHBOARD (чтобы передавался нужная модель, колонки, и сущности (readmany))
 
 app.listen(port, () => {
     console.log(`server is listening on ${port}`);

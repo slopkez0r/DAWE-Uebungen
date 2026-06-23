@@ -1,15 +1,15 @@
-<dialog id="recordModal">
+<dialog id="recordModal" open>
     <form 
         id="recordForm"
-        hx-put="/api/update/<%= model %>/<%= entity.id %>"
-        hx-target="#table-container">
+        hx-<%= method%>="<%= actionUrl%>"
+        hx-target="#table-container"
         >
+        <h1>Add new <%= model%>:</h1>
         <% for(let column of columns){ %>
             <fieldset>
                 <label>
                     <%= column %>:
                 </label>
-
                 <% if(column == "is_democratic") { %>
                     <input
                         name = "<%= column %>"
@@ -17,17 +17,17 @@
                         <%= entity[column] ? 'checked' : '' %>
                         <%= readonly ? 'disabled' : '' %>
                     >
-                <% }else{ %>
+                <% } else { %>
                     <input
                         name="<%= column %>"
                         type="text"
-                        value="<%= entity[column] ?? '' %>"
+                        value="<%= method == "put" ? entity[column] : '' %>"
                         <%= readonly ? 'readonly' : '' %>
                     >
                 <%}%>
             </fieldset>
         <% } %>
-        <button type = "button">
+        <button type = "button" onclick = recordModal.close()>
             Close
         </button>
         <% if (!readonly) { %>

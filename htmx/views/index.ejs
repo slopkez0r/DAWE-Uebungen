@@ -2,6 +2,8 @@
 <html>
     <head>
         <title>Dashboard</title>
+        <link rel="stylesheet" href="/style.css">
+        <script src="https://unpkg.com/htmx.org@2.0.4"></script>
     </head>
     <body>
         <header>Dashboard</header>
@@ -26,22 +28,27 @@
                 Rivers
             </button>
         </nav>
-
         <!--form container-->
-        <div id = "form container"> 
-            <% if(entity){%>
-                <%- include("parts/form", {  <%#render raw html %>
+        <div id="form-container">
+            <% if (entity) { %>
+                <%- include("parts/form", {
                     entity: entity,
-                    columns: columns,
-                    model: model
-                }) %
-            <%}%>
+                    columns: cols,
+                    model: model,
+                    readonly: readonly
+                }) %>
+            <% } %>
         </div>
         <!--table container-->
         <div id="table-container">
-            <%- include("parts/table", {  <%#render raw html %>
+            <button
+                hx-get="/api/create-form/<%= model %>"
+                hx-target="#form-container">
+                Create New
+            </button>
+            <%- include("parts/table", {
                 entities: entities,
-                columns: columns,
+                columns: cols,
                 model: model
             })%>
         </div>
