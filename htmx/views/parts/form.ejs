@@ -1,4 +1,4 @@
-<dialog id="recordModal" open>
+<dialog id="recordModal">
     <form 
         id="recordForm"
         hx-<%= method%>="<%= actionUrl%>"
@@ -35,3 +35,7 @@
         <% } %>
     </form>
 </dialog>
+
+<script>
+    document.getElementById("recordModal").showModal();
+</script>

@@ -1,7 +1,7 @@
 
 /*vibe code for time saving purposes*/
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
@@ -13,6 +13,8 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  --card-bg: rgba(255, 255, 255, 0.05);
 }
 
 * {
@@ -115,6 +117,19 @@ dialog {
   background-color: #242424;
   color: rgba(255, 255, 255, 0.87);
   min-width: min(520px, 90vw);
+}
+
+dialog::backdrop{
+  background: transparent;
+  backdrop-filter: blur(8px);
+  animation-name: opacityAnim;
+  animation-duration: 1s;
+  animation-fill-mode: both;
+}
+
+@keyframes opacityAnim{
+    from {background: transparent;}
+    to {background: var(--card-bg);}
 }
 
 fieldset {

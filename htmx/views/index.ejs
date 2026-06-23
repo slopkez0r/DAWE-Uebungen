@@ -43,7 +43,8 @@
         <div id="table-container">
             <button
                 hx-get="/api/create-form/<%= model %>"
-                hx-target="#form-container">
+                hx-target="#form-container"
+                >
                 Create New
             </button>
             <%- include("parts/table", {
