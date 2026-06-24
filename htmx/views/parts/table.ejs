@@ -19,15 +19,23 @@
                 <% } %>
                 <td>
                     <div class = "actions">
-                        <button hx-get="/api/details-form/<%= model %>/<%= entity.id %>" hx-target="#form-container">
-                        Show
+                        <button
+                            hx-get="/api/details-form/<%= model %>/<%= entity.id %>"
+                            hx-target="#form-container">
+                            Show
                         </button>
                     
-                        <button hx-put="/api/edit/<%=model%>/<%= entity.id %>" hx-target="#form-container">
+                        <button 
+                            hx-get="/api/update-form/<%=model%>/<%= entity.id %>"
+                            hx-target="#form-container">
                             Edit
                         </button>
 
-                        <button hx-delete="/api/delete/<%=model%>/<%= entity.id%>" hx-target="closest tr" hx-swap="outerHTML"> <!--ersetze durch leere seite-->
+                        <button 
+                            hx-delete="/api/delete/<%=model%>/<%= entity.id%>"
+                            hx-target="closest tr"
+                            hx-swap="outerHTML"
+                            > <!--ersetze durch leere seite-->
                             Delete
                         </button>
                     </div>

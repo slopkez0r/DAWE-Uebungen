@@ -47,7 +47,7 @@ app.get('/dashboard/:modelname', (req, res, next) => {
 
 app.get('/api/create-form/:modelname', (req, res, next) => {
     const model = req.params.modelname;
-    const modelName = normalize(req.params.modelname);
+    const modelName = normalize(model);
     const modelObj = getCorrectModelObject(models, modelName);
     const cols = columns[model];
     res.render("parts/form", {
@@ -60,9 +60,27 @@ app.get('/api/create-form/:modelname', (req, res, next) => {
     });
 });
 
+app.get('/api/update-form/:modelname/:id', (req, res, next) => {
+    const model = req.params.modelname;
+    const modelName = normalize(model);
+    const modelObj = getCorrectModelObject(models, modelName);
+    const cols = columns[model];
+
+    const entity = modelObj.readOne(req.params.id);
+
+    res.render("parts/form", {
+        entity: entity,
+        columns: cols,
+        model: model,
+        readonly: false,
+        method: "put",
+        actionUrl: `/api/update/${model}/${req.params.id}`
+    });
+});
+
 app.get('/api/details-form/:modelname/:id', (req, res, next) => {
     const modelName = normalize(req.params.modelname);
-    const modelObj = getCorrectModelObject(models, modelName);
+    const modelObj = getCorrectModelObject(modelName);
     const cols = columns[req.params.modelname];
     const id = req.params.id;
 
@@ -90,7 +108,7 @@ app.post('/api/create/:modelname', (req, res, next) => {
     
 
     if (model === "country") {
-        body.is_democratic = body.is_democratic === "on" ? 1 : 0; //checkbox fix
+        body.is_democratic = body.is_democratic === "on" ? true : false; //checkbox fix
     }
     
     modelObj.createOne(body);
@@ -105,27 +123,49 @@ app.post('/api/create/:modelname', (req, res, next) => {
     });
 });
 
+//PUT
+app.put('/api/update/:modelname/:id', (req, res, next) => {
+    const model = req.params.modelname;
+    const modelName = normalize(model);
+    
+    const modelObj = getCorrectModelObject(models, modelName);
+    
+    const body = req.body;
+    body.id = req.params.id;
+    if (model === "country") {
+        body.is_democratic = body.is_democratic === "on" ? true : false; //checkbox fix
+    }
 
-//READ
-app.get('/api/read/:modelname/:id', (req, res, next) => {
-    const modelName = normalize(req.params.modelname);
+    console.log(body);
+    
+    modelObj.updateOne(req.body);
+
+    const entities = modelObj.readAll();
+    const cols = columns[model];
+    
+    res.render("parts/table", {
+        entities,
+        columns: cols,
+        model
+    });
+});
+
+
+//DELETE
+app.delete('/api/delete/:modelname/:id', (req, res, next) => {
+    
+    const model = req.params.modelname;
+    const modelName = normalize(model);
+
     const id = Number.parseInt(req.params.id);
 
     const modelObj = getCorrectModelObject(models, modelName);
-    const found = modelObj.readOne(id);
-    res.status(200).json(found);
+    modelObj.deleteOne(id);
+
+    res.send("");
 });
 
-//für tabelle relevant
-app.get('/getAllEntities/:modelname', (req, res, next) => {
-    const modelName = normalize(req.params.modelname);
-    const modelObj = getCorrectModelObject(models, modelName);
-    const found = modelObj.readAll();
-    res.status(200).json(found);
-
-});
-
-//SEARCH
+//SEARCH (unimplemented)
 
 //json body
 app.post('/search/jsonBody/:modelname', (req, res, next) =>{
@@ -139,32 +179,6 @@ app.post('/search/jsonBody/:modelname', (req, res, next) =>{
         console.error(error);
         res.status(500).json({error: `An error occured while searching for the ${modelName}`});
     }
-});
-
-
-//PUT
-app.put('/api/update/:modelname', (req, res, next) => {
-    const modelName = normalize(req.params.modelname);
-    
-    const body = req.body;
-    console.log(`Body from app: ${body}`);
-    const modelObj = getCorrectModelObject(models, modelName);
-    modelObj.updateOne(body);
-    const updated = modelObj.readOne(body.id);
-    res.status(200).json(updated);
-});
-
-
-//DELETE
-app.delete('/api/delete/:modelname/:id', (req, res, next) => {
-    const modelName = normalize(req.params.modelname);
-
-    const id = Number.parseInt(req.params.id);
-
-    const modelObj = getCorrectModelObject(models, modelName);
-    const deletedRecord = modelObj.readOne(id);
-    modelObj.deleteOne(id);
-    res.status(200).json(deletedRecord);
 });
 
 
