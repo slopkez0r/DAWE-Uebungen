@@ -42,18 +42,15 @@ class DbHandler{
             const index_id = columns.indexOf("id");
             const values = Object.values(record);
 
-            var str = "";
-            for (var i = 0; i < columns.length; i++){
-                if (i!=index_id){
-                    const value = values[i];
+            const assignments = [];
 
-                    str += String(columns[i]) + " = " + this.#checktype(value);
-                    
-                    if(i<columns.length-1){
-                        str += ", ";
-                    }
+            for (var i = 0; i < columns.length; i++) {
+                if (i !== index_id) {
+                    const value = values[i];
+                    assignments.push(String(columns[i]) + " = " + this.#checktype(value));
                 }
             }
+            const str = assignments.join(", ");
             const sql = `UPDATE ${model_name.toUpperCase()} SET ${str} WHERE id = ${values[index_id]};`
             this.#persistDb(sql);   
         }else{
