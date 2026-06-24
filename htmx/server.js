@@ -13,6 +13,7 @@ const models = [new City(db), new Country(db), new River(db)];
 //PARAMS
 app.use(express.json());
 const port = 3000;
+app.use(express.urlencoded({ extended: true })); //application/x-www-form-urlencoded
 
 //FOR RENDERING
 const columns = {
@@ -62,9 +63,8 @@ app.get('/api/create-form/:modelname', (req, res, next) => {
 app.get('/api/details-form/:modelname/:id', (req, res, next) => {
     const modelName = normalize(req.params.modelname);
     const modelObj = getCorrectModelObject(models, modelName);
-    const cols = columns[modelName];
+    const cols = columns[req.params.modelname];
     const id = req.params.id;
-    console.log(id);
 
     const content = modelObj.readOne(id);
 
@@ -73,8 +73,8 @@ app.get('/api/details-form/:modelname/:id', (req, res, next) => {
         columns: cols,
         model: modelName,
         readonly: true,
-        method: "put",
-        actionUrl: ""
+        method: null,
+        actionUrl: null
     });
 });
 
@@ -82,12 +82,27 @@ app.get('/api/details-form/:modelname/:id', (req, res, next) => {
 
 //RECORD
 app.post('/api/create/:modelname', (req, res, next) => {
-    const modelName = normalize(req.params.modelname);
+    const model = req.params.modelname;
+    const modelName = normalize(model);
     const body = req.body;
-    const modelObj = getCorrectModelObject(models, modelName);
-    modelObj.createOne(body);
 
-    res.status(200).json(body);
+    const modelObj = getCorrectModelObject(models, modelName);
+    
+
+    if (model === "country") {
+        body.is_democratic = body.is_democratic === "on" ? 1 : 0; //checkbox fix
+    }
+    
+    modelObj.createOne(body);
+    
+    const entities = modelObj.readAll();
+    const cols = columns[model];
+
+    res.render("parts/table", {
+        entities,
+        columns: cols,
+        model
+    });
 });
 
 

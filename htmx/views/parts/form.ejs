@@ -1,11 +1,25 @@
 <dialog id="recordModal">
     <form 
         id="recordForm"
-        hx-<%= method%>="<%= actionUrl%>"
-        hx-target="#table-container"
-        >
-        <h1>Add new <%= model%>:</h1>
-        <% for(let column of columns){ %>
+        <% if(method && actionUrl){ %>
+            hx-<%= method%>="<%= actionUrl%>"
+            hx-target="#table-container"
+        <% } %>>
+
+        <% 
+            var title = "";
+            switch(method){
+                case "put": title = "Update current";
+                break;
+                case null: title = "Details of";
+                break;
+                case "post": title = "Create new";
+                break;
+            }
+        %>
+
+        <h1> <%= title%> <%= model%>:</h1>
+        <% for(let column of columns.slice(1)){ %>
             <fieldset>
                 <label>
                     <%= column %>:
@@ -14,14 +28,20 @@
                     <input
                         name = "<%= column %>"
                         type = "checkbox"
-                        <%= entity[column] ? 'checked' : '' %>
+                        <%= entity[column] == 1 ? 'checked' : '' %>
                         <%= readonly ? 'disabled' : '' %>
                     >
                 <% } else { %>
+                    <%
+                    const value =
+                        method == "put" || method == null
+                            ? entity[column]
+                            : "";
+                    %>
                     <input
                         name="<%= column %>"
                         type="text"
-                        value="<%= method == "put" ? entity[column] : '' %>"
+                        value="<%=value%>"
                         <%= readonly ? 'readonly' : '' %>
                     >
                 <%}%>
@@ -31,7 +51,7 @@
             Close
         </button>
         <% if (!readonly) { %>
-            <button type="submit"> Save </button>
+            <button type="submit" onclick = recordModal.close()> Save </button>
         <% } %>
     </form>
 </dialog>
